@@ -9,10 +9,10 @@ h1, h2, h3, .font-serif-title {
     font-family: 'Playfair Display', Georgia, serif;
 }
 
-/* Global Face Centering for Profile Photos */
-.profile-photo-img {
+/* Global Face Centering for All Profile Photos */
+img {
     object-fit: cover !important;
-    object-position: center 20%;
+    object-position: center 20% !important;
 }
 
 /* SVG Line Canvas Overlay styling */
