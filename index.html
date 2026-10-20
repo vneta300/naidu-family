@@ -109,7 +109,8 @@
             ]
         };
 
-        let familyData = JSON.parse(localStorage.getItem('naidu_family_tree_db')) || defaultFamilyData;
+        // Using a new storage version key to bypass old cached data
+        let familyData = JSON.parse(localStorage.getItem('naidu_family_tree_db_v3')) || defaultFamilyData;
         let isAdminLoggedIn = false;
         let currentView = 'home';
         let tempPhotoBase64 = "";
@@ -270,7 +271,7 @@
                 });
             }
 
-            localStorage.setItem('naidu_family_tree_db', JSON.stringify(familyData));
+            localStorage.setItem('naidu_family_tree_db_v3', JSON.stringify(familyData));
             closeModal('modal-edit-member');
             renderView();
         }
