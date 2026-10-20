@@ -4,791 +4,222 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Naidu Family Tree Portal</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f7ff',
-                            100: '#e0effe',
-                            500: '#1d4ed8',
-                            800: '#1e3a8a',
-                            900: '#0f172a',
-                        },
-                        gold: {
-                            400: '#fbbf24',
-                            500: '#f59e0b',
-                            600: '#d97706',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Georgia', 'serif']
-                    }
-                }
-            }
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap');
-
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        h1, h2, h3, .font-serif-title {
-            font-family: 'Playfair Display', Georgia, serif;
-        }
-
-        /* SVG Line Canvas Overlay styling */
-        .tree-connector-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-
-        /* Node pulse effect for search highlight */
-        @keyframes highlight-pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-            50% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
-        }
-        .highlight-node {
-            animation: highlight-pulse 2s infinite;
-            border-color: #f59e0b !important;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-gold-500 selection:text-white">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- Top Navigation Header -->
-    <header class="sticky top-0 z-50 bg-brand-900 text-white shadow-lg border-b border-gold-500/30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-            <!-- Brand Logo & Title -->
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('home')">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-gold-500 to-amber-300 flex items-center justify-center text-brand-900 font-bold text-xl shadow-md border border-white/20">
-                    N
-                </div>
-                <div>
-                    <h1 class="text-lg sm:text-xl font-bold tracking-tight text-amber-100 leading-tight">Naidu Family Lineage</h1>
-                    <p class="text-xs text-amber-200/70 hidden sm:block">Late Shri Gopal Rao Chirnjivlu Naidu Clan</p>
-                </div>
+    <!-- Header & Search Bar -->
+    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="cursor-pointer flex items-center gap-2" onclick="showMainView()">
+                <span class="text-2xl font-bold tracking-tight">🌳 Naidu Family Portal</span>
             </div>
-
-            <!-- Global Search Input Bar -->
-            <div class="relative flex-1 max-w-md">
-                <div class="relative">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                    <input type="text" id="global-search" 
-                        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuCfhmRW8qR-EIoDKG3HXPGnZiGHsHkyOrgHBJUCKel0j_92TBPwsFIuf1_1dY-sY04fAfxc5g1QfD/pub?gid=0&single=true&output=csv";
-                        placeholder="Search any family member (e.g. Pushplata, Santosh)..." 
-                        class="w-full pl-9 pr-10 py-1.5 bg-slate-800/80 text-sm text-slate-100 placeholder-slate-400 rounded-full border border-slate-700 focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500 transition-all"
-                        oninput="handleSearch(this.value)"
-                        onfocus="handleSearch(this.value)">
-                    <button id="search-clear-btn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                </div>
-
-                <!-- Search Results Dropdown -->
-                <div id="search-results-dropdown" class="hidden absolute left-0 right-0 mt-2 bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 max-h-80 overflow-y-auto z-50">
-                </div>
-            </div>
-
-            <!-- Quick Action Links -->
-            <div class="flex items-center space-x-2">
-                <button onclick="navigateTo('home')" class="p-2 rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center space-x-1 text-sm">
-                    <i data-lucide="network" class="w-4 h-4 text-gold-400"></i>
-                    <span class="hidden md:inline font-medium">Main Tree</span>
-                </button>
-                <button onclick="openRandomBranch()" class="p-2 rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center space-x-1 text-sm">
-                    <i data-lucide="shuffle" class="w-4 h-4 text-gold-400"></i>
-                    <span class="hidden md:inline font-medium">Random Branch</span>
-                </button>
+            <div class="w-full md:w-96 relative">
+                <input type="text" id="searchInput" placeholder="Search family member, spouse, child..." 
+                    class="w-full bg-blue-800/60 text-white placeholder-blue-300 px-4 py-2 rounded-full border border-blue-700 focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm"
+                    oninput="handleSearch(this.value)">
+                <div id="searchResults" class="absolute left-0 right-0 mt-2 bg-white text-slate-800 rounded-xl shadow-2xl overflow-hidden hidden z-50 max-h-80 overflow-y-auto border border-slate-200"></div>
             </div>
         </div>
     </header>
 
-    <!-- Main Dynamic Content Container -->
-    <main id="app-container" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 relative">
-        <!-- Rendered dynamically via JavaScript -->
+    <!-- Main Container -->
+    <main id="appContainer" class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full">
+        <!-- Content will be dynamically loaded here -->
     </main>
 
-    <!-- Global Footer -->
-    <footer class="bg-brand-900 text-slate-400 text-xs border-t border-slate-800 py-6 mt-12">
-        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
-            <p class="font-medium text-amber-200/80">Late Shri Gopal Rao Chirnjivlu Naidu & Late Smt. Narayan Amma Family Tree</p>
-            <p class="text-slate-500">Interactive Family Portal • 13 Primary Branches • Detailed Family Genealogy Records</p>
-        </div>
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-sm border-t border-slate-800">
+        <p>&copy; 2026 Naidu Family Tree Portal. Live synced with Google Sheets.</p>
     </footer>
 
-    <!-- Main JavaScript Logic & Family Database -->
+    <!-- Script to Fetch CSV and Render Portal -->
     <script>
-        // Full Family Structure Data
-        const familyData = {
-            root: {
-                id: "root",
-                head: "Late Shri Gopal Rao Chirnjivlu Naidu",
-                spouse: "Late Smt. Narayan Amma",
-                title: "Patriarch & Matriarch",
-                desc: "Founders of the Naidu Family Lineage",
-                childrenCount: 13
-            },
-            branches: [
-                {
-                    id: "b1",
-                    branchNum: 1,
-                    head: "Late Shri R. Krishna Rao Gopal Rao Naidu",
-                    spouse: "R. Pushplata Rao",
-                    spouseAge: 88,
-                    status: "Head Deceased / Spouse Alive",
-                    children: [
-                        { name: "Arun Kumar Naidu", role: "Son" },
-                        { name: "Vijay Kumar Naidu", role: "Son" }
-                    ]
-                },
-                {
-                    id: "b2",
-                    branchNum: 2,
-                    head: "Late Smt. K. Kamla Rao",
-                    spouse: "Late Shri Gopal Rao Naidu",
-                    status: "Deceased",
-                    children: [
-                        { name: "Umashankar Naidu", role: "Son" }
-                    ]
-                },
-                {
-                    id: "b3",
-                    branchNum: 3,
-                    head: "Late Shri R. Venu Rao Gopal Rao Naidu",
-                    spouse: "Late Smt. Venu Rao Naidu",
-                    status: "Deceased",
-                    children: [
-                        { name: "Shrinivas Rao", role: "Son" },
-                        { name: "Shiv Narayan Rao", role: "Son" }
-                    ]
-                },
-                {
-                    id: "b4",
-                    branchNum: 4,
-                    head: "Late Shri R. Prabhakar Rao Gopal Rao Naidu",
-                    spouse: "Late Smt. Nirmala Rao",
-                    status: "Deceased",
-                    children: [
-                        { name: "Anjana Rao", role: "Daughter" },
-                        { name: "Kanchana Rao", role: "Daughter" }
-                    ]
-                },
-                {
-                    id: "b5",
-                    branchNum: 5,
-                    head: "Late Shri R. Bhaskar Rao Gopal Rao Naidu",
-                    spouse: "Smt. R Devmani Naidu",
-                    status: "Head Deceased",
-                    children: [
-                        { name: "Manju Naidu", role: "Daughter" },
-                        { name: "Dinesh Naidu", role: "Son" }
-                    ]
-                },
-                {
-                    id: "b6",
-                    branchNum: 6,
-                    head: "Late Shri R. Raja Rao Gopal Rao Naidu",
-                    spouse: "Late Smt. R. Vimal Naidu",
-                    status: "Deceased",
-                    children: [
-                        { name: "Santosh Naidu", role: "Son", age: 54 },
-                        { name: "Sushil Naidu", role: "Son", age: 52 },
-                        { name: "Ragini Naidu", role: "Daughter", age: 51 }
-                    ]
-                },
-                {
-                    id: "b7",
-                    branchNum: 7,
-                    head: "Smt. P. Vijaylaxmi Naidu",
-                    spouse: "Late Shri Gopal Rao Naidu",
-                    status: "Alive",
-                    children: [
-                        { name: "Veena Naidu", role: "Daughter" },
-                        { name: "Deepa Naidu", role: "Daughter" },
-                        { name: "Madhuri Naidu", role: "Daughter" }
-                    ]
-                },
-                {
-                    id: "b8",
-                    branchNum: 8,
-                    head: "Late Shri Ramchandra Rao Gopal Rao Naidu",
-                    spouse: "Late Smt. Ramchandra Rao Naidu",
-                    status: "Deceased",
-                    children: [
-                        { name: "Rajesh Naidu", role: "Son" },
-                        { name: "Sunita Naidu", role: "Daughter" }
-                    ]
-                },
-                {
-                    id: "b9",
-                    branchNum: 9,
-                    head: "Shri Laxman Rao Gopal Rao Naidu",
-                    spouse: "Late Smt. Laxman Rao Naidu",
-                    status: "Alive",
-                    children: [
-                        { name: "Kirti Naidu", role: "Daughter" }
-                    ]
-                },
-                {
-                    id: "b10",
-                    branchNum: 10,
-                    head: "Shri Chirnjiv Gopal Rao Naidu",
-                    spouse: "Smt. Chirnjiv Gopal Rao Naidu",
-                    status: "Alive",
-                    children: [
-                        { name: "Jayant Naidu", role: "Son" },
-                        { name: "Madhvi Naidu", role: "Daughter" }
-                    ]
-                },
-                {
-                    id: "b11",
-                    branchNum: 11,
-                    head: "Shri Suryaprakash Rao Gopal Rao Naidu",
-                    spouse: "Smt. Suryaprakash Rao Naidu",
-                    status: "Alive",
-                    children: [
-                        { name: "Manoj Naidu", role: "Son" },
-                        { name: "Sangeeta Naidu", role: "Daughter" },
-                        { name: "Ravi Naidu", role: "Son" }
-                    ]
-                },
-                {
-                    id: "b12",
-                    branchNum: 12,
-                    head: "Shri Shankar Rao Naidu",
-                    spouse: "Smt. P. Rameshwari",
-                    status: "Alive",
-                    children: [
-                        { 
-                            name: "Neeta Naidu", 
-                            role: "Daughter",
-                            spouse: "V. Mukesh Rao",
-                            grandchildren: ["V. Miloni", "V. Nirav"]
-                        },
-                        { 
-                            name: "Leena Naidu", 
-                            role: "Daughter",
-                            spouse: "Addanky Anil",
-                            grandchildren: ["Addanky Bhavya", "Addanky Kinjal"]
-                        },
-                        { 
-                            name: "Neelkanth Naidu", 
-                            role: "Son",
-                            spouse: "J. Harika",
-                            grandchildren: ["Vartika Naidu"]
-                        }
-                    ]
-                },
-                {
-                    id: "b13",
-                    branchNum: 13,
-                    head: "Late Shri Venkat Rao Gopal Rao Naidu",
-                    spouse: "Late Smt. Laxmi Naidu",
-                    status: "Deceased",
-                    children: [
-                        { name: "Abhishek Naidu", role: "Son" },
-                        { name: "Samyukta Naidu", role: "Daughter" },
-                        { name: "Divya Naidu", role: "Daughter" }
-                    ]
-                }
-            ]
-        };
+        // ⚠️ APNI GOOGLE SHEET KI PUBLISHED CSV LINK YAHAN PASTE KAREIN ⚠️
+        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuCfhmRW8qR-EIoDKG3HXPGnZiGHsHkyOrgHBJUCKel0j_92TBPwsFIuf1_1dY-sY04fAfxc5g1QfD/pub?gid=0&single=true&output=csv";
 
-        // Current Navigation State
-        let currentView = 'home'; // 'home' or 'branch-id'
+        let familyData = [];
 
-        // Initialize Lucide Icons & Event Listeners
-        window.addEventListener('DOMContentLoaded', () => {
-            renderView();
-            window.addEventListener('resize', drawConnectorLines);
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                const searchContainer = document.getElementById('global-search').parentElement;
-                if (!searchContainer.contains(e.target)) {
-                    document.getElementById('search-results-dropdown').classList.add('hidden');
-                }
-            });
-        });
-
-        // Router Function
-        function navigateTo(viewId) {
-            currentView = viewId;
-            renderView();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        async function loadFamilyData() {
+            if(!GOOGLE_SHEET_CSV_URL || GOOGLE_SHEET_CSV_URL.includes("YOUR_PUBLISHED_CSV")) {
+                renderDefaultView();
+                return;
+            }
+            try {
+                const response = await fetch(GOOGLE_SHEET_CSV_URL);
+                const csvText = await response.text();
+                familyData = parseCSV(csvText);
+                renderMainTree();
+            } catch (error) {
+                console.error("Error loading CSV:", error);
+                renderDefaultView();
+            }
         }
 
-        function openRandomBranch() {
-            const randomIndex = Math.floor(Math.random() * familyData.branches.length);
-            navigateTo(familyData.branches[randomIndex].id);
-        }
-
-        // Render Page Views
-        function renderView() {
-            const container = document.getElementById('app-container');
-            
-            if (currentView === 'home') {
-                container.innerHTML = renderHomeMainTree();
-                setTimeout(drawConnectorLines, 100);
-            } else {
-                const branch = familyData.branches.find(b => b.id === currentView);
-                if (branch) {
-                    container.innerHTML = renderBranchPage(branch);
-                } else {
-                    container.innerHTML = `<div class="text-center py-20 text-slate-500">Branch not found. <button onclick="navigateTo('home')" class="text-brand-500 underline">Return Home</button></div>`;
+        // Simple CSV Parser
+        function parseCSV(text) {
+            let lines = text.split("\n");
+            let result = [];
+            for(let i=1; i<lines.length; i++) {
+                if(!lines[i].trim()) continue;
+                let row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                let cleanRow = row.map(val => val.replace(/^"|"$/g, '').trim());
+                if(cleanRow.length >= 2) {
+                    result.push({
+                        branchNum: cleanRow[0],
+                        head: cleanRow[1],
+                        spouse: cleanRow[2],
+                        status: cleanRow[3],
+                        childrenName: cleanRow[4] ? cleanRow[4].split(',').map(s=>s.trim()) : [],
+                        role: cleanRow[5] ? cleanRow[5].split(',').map(s=>s.trim()) : [],
+                        age: cleanRow[6],
+                        spouseName: cleanRow[7],
+                        grandchildren: cleanRow[8] ? cleanRow[8].split(',').map(s=>s.trim()) : []
+                    });
                 }
             }
-            
-            lucide.createIcons();
+            return result;
         }
 
-        // -------------------------------------------------------------
-        // MAIN FAMILY TREE FLOWCHART VIEW
-        // -------------------------------------------------------------
-        function renderHomeMainTree() {
-            return `
-                <div class="space-y-10 relative">
-                    <!-- Page Header Banner -->
-                    <div class="text-center space-y-3 max-w-3xl mx-auto pt-2">
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300">
-                            <i data-lucide="crown" class="w-3.5 h-3.5 mr-1 text-gold-600"></i> Ancestral Heritage Chart
-                        </span>
-                        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                            The Great Naidu Family Tree
-                        </h2>
-                        <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
-                            Click on any of the 13 branch cards below to open the dedicated family record page, view children details, ages, and relationships.
-                        </p>
-                    </div>
-
-                    <!-- SVG Lines Container Overlay -->
-                    <div class="relative min-h-[850px] w-full overflow-x-auto pb-8">
-                        <svg id="svg-connectors" class="tree-connector-svg">
-                            <!-- Curved line connectors dynamically injected via drawConnectorLines() -->
-                        </svg>
-
-                        <!-- ROOT NODE: Oval Shape as Requested in Sketch -->
-                        <div class="flex justify-center mb-16 relative z-20">
-                            <div id="root-node" class="bg-gradient-to-r from-brand-900 via-slate-900 to-brand-800 text-white rounded-full px-8 py-6 shadow-2xl border-4 border-gold-400 text-center transform hover:scale-105 transition-all duration-300 max-w-lg w-full cursor-pointer group"
-                                onclick="alert('Late Shri Gopal Rao Chirnjivlu Naidu & Late Smt. Narayan Amma are the root ancestors of all 13 family branches.')">
-                                <div class="flex items-center justify-center space-x-2 text-gold-400 text-xs font-bold uppercase tracking-wider mb-1">
-                                    <i data-lucide="heart" class="w-4 h-4 fill-gold-400"></i>
-                                    <span>Primary Ancestral Root</span>
-                                    <i data-lucide="heart" class="w-4 h-4 fill-gold-400"></i>
-                                </div>
-                                <h3 class="text-lg sm:text-xl font-bold font-serif-title text-amber-100 group-hover:text-amber-300 transition-colors">
-                                    ${familyData.root.head}
-                                </h3>
-                                <div class="text-sm font-medium text-amber-200/90 mt-1 flex items-center justify-center space-x-1">
-                                    <span class="text-gold-400">&</span>
-                                    <span>${familyData.root.spouse}</span>
-                                </div>
-                                <div class="mt-2 inline-block bg-gold-500/20 text-gold-300 text-xs px-3 py-0.5 rounded-full border border-gold-500/40">
-                                    13 Children • Primary Branches
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 13 BRANCHES GRID (2 Columns / 3 Columns / Responsive Layout) -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 relative z-20">
-                            ${familyData.branches.map(branch => renderBranchCardNode(branch)).join('')}
-                        </div>
-                    </div>
+        function renderDefaultView() {
+            document.getElementById('appContainer').innerHTML = `
+                <div class="text-center py-16 bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4">Google Sheet Link Missing</h2>
+                    <p class="text-slate-600 mb-6">Please paste your published Google Sheet CSV link in the <code>GOOGLE_SHEET_CSV_URL</code> variable inside the script tag.</p>
                 </div>
             `;
         }
 
-        // Branch Node Card on Main Page
-        function renderBranchCardNode(b) {
-            const isAlive = b.status.includes('Alive');
-            return `
-                <div id="node-${b.id}" 
-                    onclick="navigateTo('${b.id}')"
-                    class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-xl border border-slate-200 hover:border-gold-500 transition-all duration-300 cursor-pointer flex flex-col justify-between group relative overflow-hidden">
-                    
-                    <!-- Top Ribbon Indicator -->
-                    <div class="absolute top-0 left-0 right-0 h-1.5 ${isAlive ? 'bg-emerald-500' : 'bg-brand-800'}"></div>
+        function renderMainTree() {
+            let html = `
+                <div class="text-center mb-12">
+                    <div class="inline-block bg-amber-100 text-amber-800 font-semibold px-4 py-1.5 rounded-full text-sm mb-3 shadow-sm border border-amber-200">Root Family Lineage</div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Late Shri Gopal Rao Chirnjivlu Naidu</h1>
+                    <p class="text-slate-600 mt-2 max-w-xl mx-auto">Explore all 13 primary family branches, spouses, children, and generational hierarchy below.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            `;
 
-                    <div>
-                        <!-- Branch Number & Status -->
-                        <div class="flex items-center justify-between mb-3 text-xs">
-                            <span class="font-bold text-brand-800 bg-brand-50 px-2.5 py-1 rounded-md border border-brand-100 flex items-center space-x-1">
-                                <i data-lucide="git-branch" class="w-3.5 h-3.5 text-gold-600"></i>
-                                <span>Branch #${b.branchNum}</span>
-                            </span>
-                            <span class="text-slate-500 text-[11px] font-medium flex items-center space-x-1">
-                                <i data-lucide="${isAlive ? 'user-check' : 'user-x'}" class="w-3 h-3 ${isAlive ? 'text-emerald-500' : 'text-slate-400'}"></i>
-                                <span>${b.status}</span>
-                            </span>
-                        </div>
-
-                        <!-- Head of Household -->
-                        <h4 class="font-bold text-slate-900 text-base sm:text-lg group-hover:text-brand-800 transition-colors leading-snug">
-                            ${b.head}
-                        </h4>
-
-                        <!-- Spouse Information -->
-                        <div class="mt-2 text-xs sm:text-sm text-slate-600 flex items-center space-x-1.5">
-                            <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-500 flex-shrink-0"></i>
-                            <span class="font-medium text-slate-700">${b.spouse}</span>
-                            ${b.spouseAge ? `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-1.5 py-0.2 rounded-full">Age: ${b.spouseAge}</span>` : ''}
-                        </div>
-
-                        <!-- Children Badges -->
-                        <div class="mt-4 pt-3 border-t border-slate-100">
-                            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center space-x-1">
-                                <i data-lucide="users" class="w-3 h-3"></i>
-                                <span>Children (${b.children.length})</span>
-                            </p>
-                            <div class="flex flex-wrap gap-1.5">
-                                ${b.children.map(child => `
-                                    <span class="inline-flex items-center text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md border border-slate-200">
-                                        ${child.name} ${child.spouse ? `<span class="ml-1 text-[10px] text-rose-600 font-medium">(m. ${child.spouse})</span>` : ''} ${child.age ? `<span class="ml-1 text-[10px] text-amber-700 font-bold">(${child.age})</span>` : ''}
-                                    </span>
-                                `).join('')}
+            familyData.forEach(branch => {
+                html += `
+                    <div onclick="openBranch('${branch.branchNum}')" class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition border border-slate-200 cursor-pointer flex flex-col justify-between group">
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full">Branch #${branch.branchNum}</span>
+                                <span class="text-xs text-slate-500 font-medium">${branch.status || ''}</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition">${branch.head}</h3>
+                            ${branch.spouse ? `<p class="text-xs text-slate-500 mt-1">Spouse: ${branch.spouse}</p>` : ''}
+                            <div class="mt-4 pt-4 border-t border-slate-100">
+                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Children (${branch.childrenName.length})</p>
+                                <div class="flex flex-wrap gap-1.5">
+                                    ${branch.childrenName.map(c => `<span class="bg-slate-100 text-slate-700 text-xs px-2 py-0.5 rounded-md">${c}</span>`).join('')}
+                                </div>
                             </div>
                         </div>
+                        <div class="mt-6 flex items-center justify-between text-blue-600 text-sm font-semibold">
+                            <span>View Branch Hierarchy</span>
+                            <span class="transform group-hover:translate-x-1 transition">&rarr;</span>
+                        </div>
                     </div>
-
-                    <!-- Footer Action Callout -->
-                    <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-brand-800 group-hover:text-gold-600 transition-colors">
-                        <span>View Family Branch Page</span>
-                        <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Draw SVG Connecting Lines from Root Node to Branch Nodes
-        function drawConnectorLines() {
-            const svg = document.getElementById('svg-connectors');
-            const rootNode = document.getElementById('root-node');
-            if (!svg || !rootNode) return;
-
-            // Clear previous paths
-            svg.innerHTML = '';
-
-            const rootRect = rootNode.getBoundingClientRect();
-            const svgRect = svg.getBoundingClientRect();
-
-            // Root bottom-center coordinates relative to SVG canvas
-            const startX = (rootRect.left + rootRect.width / 2) - svgRect.left;
-            const startY = (rootRect.bottom) - svgRect.top;
-
-            familyData.branches.forEach(branch => {
-                const nodeElem = document.getElementById(`node-${branch.id}`);
-                if (!nodeElem) return;
-
-                const nodeRect = nodeElem.getBoundingClientRect();
-                const endX = (nodeRect.left + nodeRect.width / 2) - svgRect.left;
-                const endY = (nodeRect.top) - svgRect.top;
-
-                // Bezier Curve Path calculation
-                const deltaY = endY - startY;
-                const pathD = `M ${startX} ${startY} C ${startX} ${startY + deltaY * 0.4}, ${endX} ${endY - deltaY * 0.4}, ${endX} ${endY}`;
-
-                // Create SVG Path Element
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                path.setAttribute('d', pathD);
-                path.setAttribute('stroke', '#cbd5e1'); // slate-300
-                path.setAttribute('stroke-width', '2');
-                path.setAttribute('fill', 'none');
-                path.setAttribute('stroke-dasharray', '4,4'); // Dashed line style
-                svg.appendChild(path);
+                `;
             });
+
+            html += `</div>`;
+            document.getElementById('appContainer').innerHTML = html;
         }
 
-        // -------------------------------------------------------------
-        // DETAILED BRANCH FAMILY PAGE VIEW
-        // -------------------------------------------------------------
-        function renderBranchPage(b) {
-            const isAlive = b.status.includes('Alive');
-            
-            // Calculate total grandchildren across all children in this branch
-            const totalGrandchildren = b.children.reduce((acc, c) => acc + (c.children ? c.children.length : 0), 0);
+        function openBranch(branchNum) {
+            const branch = familyData.find(b => b.branchNum == branchNum);
+            if(!branch) return;
 
-            return `
-                <div class="space-y-8 animate-fadeIn">
-                    <!-- Breadcrumb Navigation -->
-                    <nav class="flex items-center space-x-2 text-xs sm:text-sm text-slate-500">
-                        <button onclick="navigateTo('home')" class="hover:text-brand-800 flex items-center space-x-1">
-                            <i data-lucide="home" class="w-4 h-4"></i>
-                            <span>Main Tree</span>
-                        </button>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-                        <span class="text-slate-400">Branch #${b.branchNum}</span>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-                        <span class="font-semibold text-brand-900">${b.head}</span>
-                    </nav>
-
-                    <!-- Branch Header Hero Banner -->
-                    <div class="bg-gradient-to-r from-brand-900 via-slate-900 to-brand-800 text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-gold-500/20 relative overflow-hidden">
-                        <div class="absolute -right-10 -bottom-10 opacity-10">
-                            <i data-lucide="tree-pine" class="w-64 h-64 text-gold-400"></i>
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            document.getElementById('appContainer').innerHTML = `
+                <button onclick="renderMainTree()" class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 bg-blue-50 px-4 py-2 rounded-xl hover:bg-blue-100 transition">
+                    &larr; Back to All Branches
+                </button>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                    <div class="flex flex-wrap justify-between items-start gap-4 mb-6 pb-6 border-b border-slate-100">
+                        <div>
+                            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">Branch #${branch.branchNum}</span>
+                            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 mt-2">${branch.head}</h1>
+                            ${branch.spouse ? `<p class="text-sm text-slate-600 mt-1">Spouse: <span class="font-medium text-slate-800">${branch.spouse}</span></p>` : ''}
                         </div>
-
-                        <div class="relative z-10 space-y-4">
-                            <div class="flex flex-wrap items-center justify-between gap-3">
-                                <span class="bg-gold-500 text-brand-900 font-bold text-xs uppercase px-3 py-1 rounded-full tracking-wider">
-                                    Primary Branch #${b.branchNum}
-                                </span>
-                                <span class="text-slate-300 text-xs sm:text-sm flex items-center space-x-1">
-                                    <i data-lucide="info" class="w-4 h-4 text-gold-400"></i>
-                                    <span>Status: ${b.status}</span>
-                                </span>
-                            </div>
-
-                            <h2 class="text-2xl sm:text-4xl font-extrabold text-amber-100 font-serif-title leading-tight">
-                                ${b.head}
-                            </h2>
-
-                            <div class="pt-2 flex flex-wrap items-center gap-6 text-sm text-amber-200/90 border-t border-white/10">
-                                <div class="flex items-center space-x-2">
-                                    <i data-lucide="heart" class="w-4 h-4 text-rose-400"></i>
-                                    <span>Spouse: <strong>${b.spouse}</strong></span>
-                                    ${b.spouseAge ? `<span class="bg-rose-500/30 text-rose-200 text-xs px-2 py-0.5 rounded-full border border-rose-400/40">Age: ${b.spouseAge}</span>` : ''}
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">Children & Descendants</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${branch.childrenName.map((child, idx) => `
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                                <div class="flex justify-between items-start">
+                                    <h4 class="font-bold text-slate-900">${child}</h4>
+                                    <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-medium">${branch.role[idx] || 'Child'}</span>
                                 </div>
-                                <div class="flex items-center space-x-2">
-                                    <i data-lucide="users" class="w-4 h-4 text-gold-400"></i>
-                                    <span>Children: <strong>${b.children.length} Members</strong></span>
-                                </div>
-                                ${totalGrandchildren > 0 ? `
-                                    <div class="flex items-center space-x-2">
-                                        <i data-lucide="sparkles" class="w-4 h-4 text-amber-300"></i>
-                                        <span>Grandchildren: <strong>${totalGrandchildren} Members</strong></span>
+                                ${branch.spouseName && branch.spouseName !== '-' ? `<p class="text-xs text-slate-500 mt-2">Married to: <span class="text-slate-700 font-medium">${branch.spouseName}</span></p>` : ''}
+                                ${branch.grandchildren.length > 0 ? `
+                                    <div class="mt-3 pt-3 border-t border-slate-200">
+                                        <p class="text-xs font-bold text-slate-400 uppercase">Grandchildren</p>
+                                        <div class="flex flex-wrap gap-1 mt-1">
+                                            ${branch.grandchildren.map(g => `<span class="bg-amber-100 text-amber-900 text-xs px-2 py-0.5 rounded">${g}</span>`).join('')}
+                                        </div>
                                     </div>
                                 ` : ''}
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Lineage Parent Relationship Badge -->
-                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center space-x-3 text-amber-900 text-sm">
-                        <i data-lucide="git-merge" class="w-5 h-5 text-gold-600 flex-shrink-0"></i>
-                        <div>
-                            <strong>Direct Ancestry Link:</strong> This branch originates directly from 
-                            <span class="underline font-semibold cursor-pointer" onclick="navigateTo('home')">Late Shri Gopal Rao Chirnjivlu Naidu & Late Smt. Narayan Amma</span>.
-                        </div>
-                    </div>
-
-                    <!-- Children & Grandchildren Tree Hierarchy Section -->
-                    <div class="space-y-6">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-bold text-slate-900 font-serif-title flex items-center space-x-2">
-                                <i data-lucide="users" class="w-5 h-5 text-brand-800"></i>
-                                <span>Children & Grandchildren Lineage (${b.children.length})</span>
-                            </h3>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Children List Section -->
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-bold text-slate-900 font-serif-title flex items-center space-x-2">
-                                <i data-lucide="users" class="w-5 h-5 text-brand-800"></i>
-                                <span>Children & Next Generation (${b.children.length})</span>
-                            </h3>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                            ${b.children.map(child => `
-                                <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
-                                    <div class="flex items-start space-x-4">
-                                        <div class="w-12 h-12 rounded-full bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-800 font-bold text-lg flex-shrink-0">
-                                            ${child.name.charAt(0)}
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <h4 class="font-bold text-slate-900 text-base truncate">${child.name}</h4>
-                                            <p class="text-xs text-slate-500 mt-0.5">Relation: ${child.role || 'Member'}</p>
-                                            ${child.spouse ? `
-                                                <div class="mt-1 text-xs text-slate-600 flex items-center space-x-1">
-                                                    <i data-lucide="heart" class="w-3 h-3 text-rose-500"></i>
-                                                    <span>Married to: <strong>${child.spouse}</strong></span>
-                                                </div>
-                                            ` : ''}
-                                            ${child.age ? `
-                                                <div class="mt-2 inline-flex items-center space-x-1 bg-amber-50 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-amber-200">
-                                                    <i data-lucide="calendar" class="w-3 h-3 text-gold-600"></i>
-                                                    <span>Age: ${child.age} years</span>
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                    </div>
-
-                                    ${child.grandchildren && child.grandchildren.length > 0 ? `
-                                        <div class="pt-3 border-t border-slate-100">
-                                            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center space-x-1">
-                                                <i data-lucide="baby" class="w-3.5 h-3.5 text-gold-600"></i>
-                                                <span>Children (${child.grandchildren.length})</span>
-                                            </p>
-                                            <div class="flex flex-wrap gap-1">
-                                                ${child.grandchildren.map(gc => `
-                                                    <span class="inline-flex items-center text-xs bg-amber-50/80 text-amber-900 px-2 py-0.5 rounded border border-amber-200/60 font-medium">
-                                                        ${gc}
-                                                    </span>
-                                                `).join('')}
-                                            </div>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <!-- Quick Navigation to Other Branches Carousel/Grid -->
-                    <div class="pt-8 border-t border-slate-200 space-y-4">
-                        <h4 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Switch to another Family Branch</h4>
-                        <div class="flex space-x-3 overflow-x-auto pb-4 pt-1">
-                            ${familyData.branches.map(other => `
-                                <button onclick="navigateTo('${other.id}')" 
-                                    class="flex-shrink-0 px-4 py-2.5 rounded-xl border ${other.id === b.id ? 'bg-brand-900 text-white border-brand-900' : 'bg-white text-slate-700 border-slate-200 hover:border-gold-500'} text-xs font-semibold shadow-sm transition-all flex items-center space-x-2">
-                                    <span>#${other.branchNum} ${other.head.replace('Late Shri ', '').replace('Late Smt. ', '')}</span>
-                                </button>
-                            `).join('')}
-                        </div>
+                        `).join('')}
                     </div>
                 </div>
             `;
         }
 
-        // -------------------------------------------------------------
-        // GLOBAL SEARCH ENGINE LOGIC
-        // -------------------------------------------------------------
         function handleSearch(query) {
-            const dropdown = document.getElementById('search-results-dropdown');
-            const clearBtn = document.getElementById('search-clear-btn');
-            
-            if (!query || query.trim() === '') {
-                dropdown.classList.add('hidden');
-                clearBtn.classList.add('hidden');
+            const resultsBox = document.getElementById('searchResults');
+            if(!query.trim()) {
+                resultsBox.classList.add('hidden');
                 return;
             }
+            const q = query.toLowerCase();
+            let matches = [];
 
-            clearBtn.classList.remove('hidden');
-            const searchTerm = query.toLowerCase().trim();
-            const matches = [];
-
-            // Search Root Parents
-            if (familyData.root.head.toLowerCase().includes(searchTerm) || familyData.root.spouse.toLowerCase().includes(searchTerm)) {
-                matches.push({
-                    name: `${familyData.root.head} & ${familyData.root.spouse}`,
-                    type: "Root Ancestors",
-                    action: () => navigateTo('home')
+            familyData.forEach(b => {
+                if(b.head.toLowerCase().includes(q) || (b.spouse && b.spouse.toLowerCase().includes(q))) {
+                    matches.push({name: `${b.head} (Branch #${b.branchNum})`, branchNum: b.branchNum});
+                }
+                b.childrenName.forEach(c => {
+                    if(c.toLowerCase().includes(q)) {
+                        matches.push({name: `${c} (Child under Branch #${b.branchNum})`, branchNum: b.branchNum});
+                    }
                 });
-            }
-
-            // Search Primary Branch Heads & Spouses & Children
-            familyData.branches.forEach(b => {
-                if (b.head.toLowerCase().includes(searchTerm)) {
-                    matches.push({
-                        name: b.head,
-                        type: `Branch #${b.branchNum} Head`,
-                        action: () => navigateTo(b.id)
-                    });
-                }
-                if (b.spouse && b.spouse.toLowerCase().includes(searchTerm)) {
-                    matches.push({
-                        name: b.spouse,
-                        type: `Spouse in Branch #${b.branchNum}`,
-                        action: () => navigateTo(b.id)
-                    });
-                }
-                b.children.forEach(c => {
-                    if (c.name.toLowerCase().includes(searchTerm)) {
-                        matches.push({
-                            name: c.name + (c.age ? ` (${c.age} yrs)` : ''),
-                            type: `Child in Branch #${b.branchNum} (${b.head.replace('Late Shri ', '').replace('Shri ', '')})`,
-                            action: () => navigateTo(b.id)
-                        });
-                    }
-                    if (c.spouse && c.spouse.toLowerCase().includes(searchTerm)) {
-                        matches.push({
-                            name: c.spouse,
-                            type: `Spouse of ${c.name} in Branch #${b.branchNum}`,
-                            action: () => navigateTo(b.id)
-                        });
-                    }
-                    if (c.grandchildren) {
-                        c.grandchildren.forEach(gc => {
-                            if (gc.toLowerCase().includes(searchTerm)) {
-                                matches.push({
-                                    name: gc,
-                                    type: `Grandchild of ${b.head.replace('Late Shri ', '').replace('Shri ', '')} (Child of ${c.name})`,
-                                    action: () => navigateTo(b.id)
-                                });
-                            }
-                        });
+                b.grandchildren.forEach(g => {
+                    if(g.toLowerCase().includes(q)) {
+                        matches.push({name: `${g} (Grandchild under Branch #${b.branchNum})`, branchNum: b.branchNum});
                     }
                 });
             });
 
-            // Render Results
-            if (matches.length > 0) {
-                dropdown.innerHTML = matches.map((m, idx) => `
-                    <div onclick="executeSearchAction(${idx})" class="p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-none flex items-center justify-between">
-                        <div>
-                            <p class="font-semibold text-slate-800 text-sm">${m.name}</p>
-                            <p class="text-xs text-brand-800">${m.type}</p>
-                        </div>
-                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-400"></i>
+            if(matches.length > 0) {
+                resultsBox.innerHTML = matches.slice(0, 5).map(m => `
+                    <div onclick="openBranch('${m.branchNum}'); document.getElementById('searchResults').classList.add('hidden'); document.getElementById('searchInput').value='';" 
+                         class="px-4 py-3 hover:bg-slate-100 cursor-pointer text-sm font-medium border-b border-slate-100 last:border-b-0">
+                        ${m.name}
                     </div>
                 `).join('');
-                dropdown.dataset.matches = JSON.stringify(matches);
-                dropdown.classList.remove('hidden');
+                resultsBox.classList.remove('hidden');
             } else {
-                dropdown.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">No family member matching "${query}"</div>`;
-                dropdown.classList.remove('hidden');
-            }
-            
-            lucide.createIcons();
-        }
-
-        function executeSearchAction(index) {
-            const dropdown = document.getElementById('search-results-dropdown');
-            const matches = JSON.parse(dropdown.dataset.matches || '[]');
-            if (matches[index]) {
-                matches[index].action();
-                dropdown.classList.add('hidden');
-                document.getElementById('global-search').value = '';
-                document.getElementById('search-clear-btn').classList.add('hidden');
+                resultsBox.innerHTML = `<div class="px-4 py-3 text-sm text-slate-500">No family member found</div>`;
+                resultsBox.classList.remove('hidden');
             }
         }
 
-        function clearSearch() {
-            document.getElementById('global-search').value = '';
-            document.getElementById('search-results-dropdown').classList.add('hidden');
-            document.getElementById('search-clear-btn').classList.add('hidden');
-        }
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('#searchInput') && !e.target.closest('#searchResults')) {
+                document.getElementById('searchResults').classList.add('hidden');
+            }
+        });
+
+        loadFamilyData();
     </script>
 </body>
 </html>
