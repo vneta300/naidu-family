@@ -284,35 +284,27 @@
                 {
                     id: "b12",
                     branchNum: 12,
-                    head: "Shri Shankar Rao Gopal Rao Naidu",
-                    spouse: "Smt. Shankar Rao Naidu",
+                    head: "Shri Shankar Rao Naidu",
+                    spouse: "Smt. P. Rameshwari",
                     status: "Alive",
                     children: [
                         { 
                             name: "Neeta Naidu", 
                             role: "Daughter",
-                            spouse: "V Mukesh Rao",
-                            children: [
-                                { name: "V Miloni", role: "Granddaughter" },
-                                { name: "V Nirav", role: "Grandson" }
-                            ]
+                            spouse: "V. Mukesh Rao",
+                            grandchildren: ["V. Miloni", "V. Nirav"]
                         },
                         { 
                             name: "Leena Naidu", 
                             role: "Daughter",
                             spouse: "Addanky Anil",
-                            children: [
-                                { name: "Addanky Bhavya", role: "Granddaughter" },
-                                { name: "Addanky Kinjal", role: "Granddaughter" }
-                            ]
+                            grandchildren: ["Addanky Bhavya", "Addanky Kinjal"]
                         },
                         { 
                             name: "Neelkanth Naidu", 
                             role: "Son",
                             spouse: "J. Harika",
-                            children: [
-                                { name: "Vartika Naidu", role: "Granddaughter" }
-                            ]
+                            grandchildren: ["Vartika Naidu"]
                         }
                     ]
                 },
@@ -618,24 +610,31 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Children List Section -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-slate-900 font-serif-title flex items-center space-x-2">
+                                <i data-lucide="users" class="w-5 h-5 text-brand-800"></i>
+                                <span>Children & Next Generation (${b.children.length})</span>
+                            </h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                             ${b.children.map(child => `
-                                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 relative">
-                                    <!-- Child Header Node -->
+                                <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
                                     <div class="flex items-start space-x-4">
                                         <div class="w-12 h-12 rounded-full bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-800 font-bold text-lg flex-shrink-0">
                                             ${child.name.charAt(0)}
                                         </div>
                                         <div class="flex-1 min-w-0">
-                                            <h4 class="font-bold text-slate-900 text-base leading-snug">${child.name}</h4>
+                                            <h4 class="font-bold text-slate-900 text-base truncate">${child.name}</h4>
                                             <p class="text-xs text-slate-500 mt-0.5">Relation: ${child.role || 'Member'}</p>
-                                            
                                             ${child.spouse ? `
-                                                <div class="mt-2 inline-flex items-center space-x-1.5 bg-rose-50 text-rose-800 text-xs font-semibold px-2.5 py-1 rounded-lg border border-rose-200">
+                                                <div class="mt-1 text-xs text-slate-600 flex items-center space-x-1">
                                                     <i data-lucide="heart" class="w-3 h-3 text-rose-500"></i>
                                                     <span>Married to: <strong>${child.spouse}</strong></span>
                                                 </div>
                                             ` : ''}
-
                                             ${child.age ? `
                                                 <div class="mt-2 inline-flex items-center space-x-1 bg-amber-50 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-amber-200">
                                                     <i data-lucide="calendar" class="w-3 h-3 text-gold-600"></i>
@@ -645,24 +644,17 @@
                                         </div>
                                     </div>
 
-                                    <!-- Grandchildren Sub-Tree Nodes (If present) -->
-                                    ${child.children && child.children.length > 0 ? `
-                                        <div class="pt-4 border-t border-slate-100 bg-slate-50/80 -mx-6 -mb-6 p-4 rounded-b-2xl">
-                                            <div class="flex items-center space-x-1.5 text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">
-                                                <i data-lucide="corner-down-right" class="w-4 h-4 text-brand-800"></i>
-                                                <span>Grandchildren (${child.children.length})</span>
-                                            </div>
-                                            <div class="space-y-2 pl-2">
-                                                ${child.children.map(grandchild => `
-                                                    <div class="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-slate-200 text-xs shadow-2xs">
-                                                        <div class="flex items-center space-x-2">
-                                                            <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center font-bold text-[10px]">
-                                                                ${grandchild.name.charAt(0)}
-                                                            </div>
-                                                            <span class="font-semibold text-slate-800">${grandchild.name}</span>
-                                                        </div>
-                                                        <span class="text-[10px] text-slate-400 font-medium">${grandchild.role || 'Grandchild'}</span>
-                                                    </div>
+                                    ${child.grandchildren && child.grandchildren.length > 0 ? `
+                                        <div class="pt-3 border-t border-slate-100">
+                                            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center space-x-1">
+                                                <i data-lucide="baby" class="w-3.5 h-3.5 text-gold-600"></i>
+                                                <span>Children (${child.grandchildren.length})</span>
+                                            </p>
+                                            <div class="flex flex-wrap gap-1">
+                                                ${child.grandchildren.map(gc => `
+                                                    <span class="inline-flex items-center text-xs bg-amber-50/80 text-amber-900 px-2 py-0.5 rounded border border-amber-200/60 font-medium">
+                                                        ${gc}
+                                                    </span>
                                                 `).join('')}
                                             </div>
                                         </div>
@@ -714,7 +706,7 @@
                 });
             }
 
-            // Search Primary Branch Heads & Spouses & Children & Grandchildren
+            // Search Primary Branch Heads & Spouses & Children
             familyData.branches.forEach(b => {
                 if (b.head.toLowerCase().includes(searchTerm)) {
                     matches.push({
@@ -734,7 +726,7 @@
                     if (c.name.toLowerCase().includes(searchTerm)) {
                         matches.push({
                             name: c.name + (c.age ? ` (${c.age} yrs)` : ''),
-                            type: `Child in Branch #${b.branchNum} (${b.head.replace('Late Shri ', '')})`,
+                            type: `Child in Branch #${b.branchNum} (${b.head.replace('Late Shri ', '').replace('Shri ', '')})`,
                             action: () => navigateTo(b.id)
                         });
                     }
@@ -745,12 +737,12 @@
                             action: () => navigateTo(b.id)
                         });
                     }
-                    if (c.children) {
-                        c.children.forEach(gc => {
-                            if (gc.name.toLowerCase().includes(searchTerm)) {
+                    if (c.grandchildren) {
+                        c.grandchildren.forEach(gc => {
+                            if (gc.toLowerCase().includes(searchTerm)) {
                                 matches.push({
-                                    name: gc.name,
-                                    type: `Grandchild in Branch #${b.branchNum} (${c.name}'s child)`,
+                                    name: gc,
+                                    type: `Grandchild of ${b.head.replace('Late Shri ', '').replace('Shri ', '')} (Child of ${c.name})`,
                                     action: () => navigateTo(b.id)
                                 });
                             }
