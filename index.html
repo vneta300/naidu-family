@@ -288,9 +288,32 @@
                     spouse: "Smt. Shankar Rao Naidu",
                     status: "Alive",
                     children: [
-                        { name: "Neeta Naidu", role: "Daughter" },
-                        { name: "Leena Naidu", role: "Daughter" },
-                        { name: "Neelkanth Naidu", role: "Son" }
+                        { 
+                            name: "Neeta Naidu", 
+                            role: "Daughter",
+                            spouse: "V Mukesh Rao",
+                            children: [
+                                { name: "V Miloni", role: "Granddaughter" },
+                                { name: "V Nirav", role: "Grandson" }
+                            ]
+                        },
+                        { 
+                            name: "Leena Naidu", 
+                            role: "Daughter",
+                            spouse: "Addanky Anil",
+                            children: [
+                                { name: "Addanky Bhavya", role: "Granddaughter" },
+                                { name: "Addanky Kinjal", role: "Granddaughter" }
+                            ]
+                        },
+                        { 
+                            name: "Neelkanth Naidu", 
+                            role: "Son",
+                            spouse: "J. Harika",
+                            children: [
+                                { name: "Vartika Naidu", role: "Granddaughter" }
+                            ]
+                        }
                     ]
                 },
                 {
@@ -457,7 +480,7 @@
                             <div class="flex flex-wrap gap-1.5">
                                 ${b.children.map(child => `
                                     <span class="inline-flex items-center text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md border border-slate-200">
-                                        ${child.name} ${child.age ? `<span class="ml-1 text-[10px] text-amber-700 font-bold">(${child.age})</span>` : ''}
+                                        ${child.name} ${child.spouse ? `<span class="ml-1 text-[10px] text-rose-600 font-medium">(m. ${child.spouse})</span>` : ''} ${child.age ? `<span class="ml-1 text-[10px] text-amber-700 font-bold">(${child.age})</span>` : ''}
                                     </span>
                                 `).join('')}
                             </div>
@@ -517,6 +540,10 @@
         // -------------------------------------------------------------
         function renderBranchPage(b) {
             const isAlive = b.status.includes('Alive');
+            
+            // Calculate total grandchildren across all children in this branch
+            const totalGrandchildren = b.children.reduce((acc, c) => acc + (c.children ? c.children.length : 0), 0);
+
             return `
                 <div class="space-y-8 animate-fadeIn">
                     <!-- Breadcrumb Navigation -->
@@ -562,6 +589,12 @@
                                     <i data-lucide="users" class="w-4 h-4 text-gold-400"></i>
                                     <span>Children: <strong>${b.children.length} Members</strong></span>
                                 </div>
+                                ${totalGrandchildren > 0 ? `
+                                    <div class="flex items-center space-x-2">
+                                        <i data-lucide="sparkles" class="w-4 h-4 text-amber-300"></i>
+                                        <span>Grandchildren: <strong>${totalGrandchildren} Members</strong></span>
+                                    </div>
+                                ` : ''}
                             </div>
                         </div>
                     </div>
@@ -575,31 +608,65 @@
                         </div>
                     </div>
 
-                    <!-- Children List Section -->
-                    <div class="space-y-4">
+                    <!-- Children & Grandchildren Tree Hierarchy Section -->
+                    <div class="space-y-6">
                         <div class="flex items-center justify-between">
                             <h3 class="text-xl font-bold text-slate-900 font-serif-title flex items-center space-x-2">
                                 <i data-lucide="users" class="w-5 h-5 text-brand-800"></i>
-                                <span>Children & Next Generation (${b.children.length})</span>
+                                <span>Children & Grandchildren Lineage (${b.children.length})</span>
                             </h3>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             ${b.children.map(child => `
-                                <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex items-start space-x-4">
-                                    <div class="w-12 h-12 rounded-full bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-800 font-bold text-lg flex-shrink-0">
-                                        ${child.name.charAt(0)}
+                                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 relative">
+                                    <!-- Child Header Node -->
+                                    <div class="flex items-start space-x-4">
+                                        <div class="w-12 h-12 rounded-full bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-800 font-bold text-lg flex-shrink-0">
+                                            ${child.name.charAt(0)}
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="font-bold text-slate-900 text-base leading-snug">${child.name}</h4>
+                                            <p class="text-xs text-slate-500 mt-0.5">Relation: ${child.role || 'Member'}</p>
+                                            
+                                            ${child.spouse ? `
+                                                <div class="mt-2 inline-flex items-center space-x-1.5 bg-rose-50 text-rose-800 text-xs font-semibold px-2.5 py-1 rounded-lg border border-rose-200">
+                                                    <i data-lucide="heart" class="w-3 h-3 text-rose-500"></i>
+                                                    <span>Married to: <strong>${child.spouse}</strong></span>
+                                                </div>
+                                            ` : ''}
+
+                                            ${child.age ? `
+                                                <div class="mt-2 inline-flex items-center space-x-1 bg-amber-50 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-amber-200">
+                                                    <i data-lucide="calendar" class="w-3 h-3 text-gold-600"></i>
+                                                    <span>Age: ${child.age} years</span>
+                                                </div>
+                                            ` : ''}
+                                        </div>
                                     </div>
-                                    <div class="flex-1 min-w-0">
-                                        <h4 class="font-bold text-slate-900 text-base truncate">${child.name}</h4>
-                                        <p class="text-xs text-slate-500 mt-0.5">Relation: ${child.role || 'Member'}</p>
-                                        ${child.age ? `
-                                            <div class="mt-2 inline-flex items-center space-x-1 bg-amber-50 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-amber-200">
-                                                <i data-lucide="calendar" class="w-3 h-3 text-gold-600"></i>
-                                                <span>Age: ${child.age} years</span>
+
+                                    <!-- Grandchildren Sub-Tree Nodes (If present) -->
+                                    ${child.children && child.children.length > 0 ? `
+                                        <div class="pt-4 border-t border-slate-100 bg-slate-50/80 -mx-6 -mb-6 p-4 rounded-b-2xl">
+                                            <div class="flex items-center space-x-1.5 text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">
+                                                <i data-lucide="corner-down-right" class="w-4 h-4 text-brand-800"></i>
+                                                <span>Grandchildren (${child.children.length})</span>
                                             </div>
-                                        ` : ''}
-                                    </div>
+                                            <div class="space-y-2 pl-2">
+                                                ${child.children.map(grandchild => `
+                                                    <div class="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-slate-200 text-xs shadow-2xs">
+                                                        <div class="flex items-center space-x-2">
+                                                            <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center font-bold text-[10px]">
+                                                                ${grandchild.name.charAt(0)}
+                                                            </div>
+                                                            <span class="font-semibold text-slate-800">${grandchild.name}</span>
+                                                        </div>
+                                                        <span class="text-[10px] text-slate-400 font-medium">${grandchild.role || 'Grandchild'}</span>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    ` : ''}
                                 </div>
                             `).join('')}
                         </div>
@@ -647,7 +714,7 @@
                 });
             }
 
-            // Search Primary Branch Heads & Spouses & Children
+            // Search Primary Branch Heads & Spouses & Children & Grandchildren
             familyData.branches.forEach(b => {
                 if (b.head.toLowerCase().includes(searchTerm)) {
                     matches.push({
@@ -669,6 +736,24 @@
                             name: c.name + (c.age ? ` (${c.age} yrs)` : ''),
                             type: `Child in Branch #${b.branchNum} (${b.head.replace('Late Shri ', '')})`,
                             action: () => navigateTo(b.id)
+                        });
+                    }
+                    if (c.spouse && c.spouse.toLowerCase().includes(searchTerm)) {
+                        matches.push({
+                            name: c.spouse,
+                            type: `Spouse of ${c.name} in Branch #${b.branchNum}`,
+                            action: () => navigateTo(b.id)
+                        });
+                    }
+                    if (c.children) {
+                        c.children.forEach(gc => {
+                            if (gc.name.toLowerCase().includes(searchTerm)) {
+                                matches.push({
+                                    name: gc.name,
+                                    type: `Grandchild in Branch #${b.branchNum} (${c.name}'s child)`,
+                                    action: () => navigateTo(b.id)
+                                });
+                            }
                         });
                     }
                 });
