@@ -4,969 +4,180 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Naidu Family Tree Portal</title>
-
-    <!-- 1. External Custom CSS File -->
     <link rel="stylesheet" href="styles.css">
-
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f7ff',
-                            100: '#e0effe',
-                            500: '#1d4ed8',
-                            800: '#1e3a8a',
-                            900: '#0f172a',
-                        },
-                        gold: {
-                            400: '#fbbf24',
-                            500: '#f59e0b',
-                            600: '#d97706',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Georgia', 'serif']
-                    }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-gold-500 selection:text-white">
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <!-- Top Navigation Header -->
     <header class="sticky top-0 z-40 bg-brand-900 text-white shadow-lg border-b border-gold-500/30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-            <!-- Brand Logo & Title -->
             <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('home')">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-gold-500 to-amber-300 flex items-center justify-center text-brand-900 font-bold text-xl shadow-md border border-white/20">
-                    N
-                </div>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-gold-500 to-amber-300 flex items-center justify-center text-brand-900 font-bold text-xl">N</div>
                 <div>
-                    <h1 class="text-base sm:text-xl font-bold tracking-tight text-amber-100 leading-tight">Naidu Family Portal</h1>
-                    <p class="text-xs text-amber-200/70 hidden sm:block">Late Shri Gopal Rao Chirnjivlu Naidu Clan</p>
+                    <h1 class="text-base sm:text-xl font-bold text-amber-100">Naidu Family Portal</h1>
                 </div>
             </div>
-
-            <!-- Global Search Input Bar -->
-            <div class="relative flex-1 max-w-xs sm:max-w-md">
-                <div class="relative">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                    <input type="text" id="global-search" 
-                        placeholder="Search members (e.g. Jayshree, Miloni)..." 
-                        class="w-full pl-9 pr-8 py-1.5 bg-slate-800/80 text-xs sm:text-sm text-slate-100 placeholder-slate-400 rounded-full border border-slate-700 focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500 transition-all"
-                        oninput="handleSearch(this.value)"
-                        onfocus="handleSearch(this.value)">
-                    <button id="search-clear-btn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                </div>
-
-                <!-- Search Results Dropdown -->
-                <div id="search-results-dropdown" class="hidden absolute left-0 right-0 mt-2 bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 max-h-80 overflow-y-auto z-50">
-                </div>
-            </div>
-
-            <!-- Header Action Controls -->
             <div class="flex items-center space-x-2">
-                <!-- Admin Mode Status Button -->
-                <button id="admin-toggle-btn" onclick="toggleAdminModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-amber-300 border border-gold-500/30 flex items-center space-x-1.5 transition-all">
-                    <i data-lucide="lock" id="admin-icon" class="w-3.5 h-3.5"></i>
+                <button id="admin-toggle-btn" onclick="toggleAdminModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs font-semibold text-amber-300 border border-gold-500/30">
                     <span id="admin-btn-text">Admin Login</span>
-                </button>
-
-                <!-- Data Sync Options -->
-                <button onclick="openSyncModal()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-gold-400 transition-colors" title="Google Sheet / CSV Export & Import">
-                    <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Admin Mode Status Banner (Shown when Admin logged in) -->
-    <div id="admin-banner" class="hidden bg-amber-500 text-brand-900 px-4 py-2 text-xs font-bold flex items-center justify-between border-b border-amber-600 shadow-inner">
-        <div class="flex items-center space-x-2">
-            <i data-lucide="shield-check" class="w-4 h-4"></i>
-            <span>Admin Mode Enabled — You can now edit names, photos, add new children & grandchildren, or delete members.</span>
-        </div>
-        <button onclick="logoutAdmin()" class="underline hover:text-white text-[11px]">Logout Admin</button>
+    <div id="admin-banner" class="hidden bg-amber-500 text-brand-900 px-4 py-2 text-xs font-bold flex items-center justify-between">
+        <span>Admin Mode Enabled — You can now add/edit photos for children & grandchildren.</span>
+        <button onclick="logoutAdmin()" class="underline">Logout</button>
     </div>
 
-    <!-- Main Dynamic Content Container -->
-    <main id="app-container" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 relative">
-        <!-- Rendered dynamically via JavaScript -->
-    </main>
+    <main id="app-container" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 relative"></main>
 
-    <!-- Global Footer -->
-    <footer class="bg-brand-900 text-slate-400 text-xs border-t border-slate-800 py-6 mt-12">
-        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
-            <p class="font-medium text-amber-200/80">Late Shri Gopal Rao Chirnjivlu Naidu & Late Smt. Narayan Amma Family Tree</p>
-            <p class="text-slate-500">Interactive Editable Family Portal • Admin Enabled • Google Sheets CSV Export Sync</p>
-        </div>
-    </footer>
-
-    <!-- ==================== MODALS ==================== -->
-
-    <!-- Admin Login Modal -->
-    <div id="modal-admin-login" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-slate-200 relative animate-fadeIn">
-            <button onclick="closeModal('modal-admin-login')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-            <div class="text-center space-y-2 mb-5">
-                <div class="w-12 h-12 bg-amber-100 text-amber-800 rounded-full flex items-center justify-center mx-auto">
-                    <i data-lucide="key-round" class="w-6 h-6"></i>
-                </div>
-                <h3 class="text-xl font-bold text-slate-900 font-serif-title">Admin Authorization</h3>
-                <p class="text-xs text-slate-500">Enter Admin PIN to enable live editing and photo uploads (Default PIN: <code class="bg-slate-100 px-1 py-0.5 rounded font-mono font-bold text-slate-700">1234</code>)</p>
-            </div>
-            <form onsubmit="verifyAdminPin(event)" class="space-y-4">
-                <div>
-                    <input type="password" id="admin-pin-input" placeholder="Enter PIN (1234)" 
-                        class="w-full text-center tracking-widest text-lg font-bold py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-gold-500 focus:outline-none">
-                    <p id="pin-error-msg" class="hidden text-xs text-rose-600 text-center mt-1.5 font-medium">Incorrect PIN. Please try again.</p>
-                </div>
-                <button type="submit" class="w-full bg-brand-800 hover:bg-brand-900 text-white font-bold py-2.5 rounded-xl shadow transition-colors flex items-center justify-center space-x-2 text-sm">
-                    <i data-lucide="unlock" class="w-4 h-4 text-gold-400"></i>
-                    <span>Authenticate</span>
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Edit Member / Add Member Modal -->
+    <!-- Edit Modal -->
     <div id="modal-edit-member" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 relative my-8 animate-fadeIn max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('modal-edit-member')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-            <h3 id="edit-modal-title" class="text-xl font-bold text-slate-900 font-serif-title mb-4 pb-2 border-b">Edit Family Member</h3>
+        <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl relative my-8 max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('modal-edit-member')" class="absolute top-4 right-4 text-slate-400">✕</button>
+            <h3 id="edit-modal-title" class="text-xl font-bold mb-4 pb-2 border-b">Edit Member</h3>
             
             <form onsubmit="saveMemberChanges(event)" class="space-y-4">
                 <input type="hidden" id="edit-branch-id">
-                <input type="hidden" id="edit-member-type"> <!-- 'head', 'child', 'grandchild', 'new_child', 'new_grandchild' -->
+                <input type="hidden" id="edit-member-type">
                 <input type="hidden" id="edit-child-index">
                 <input type="hidden" id="edit-gc-index">
 
-                <!-- Photo Upload / Preview Section -->
                 <div class="space-y-2">
                     <label class="block text-xs font-bold uppercase text-slate-500">Profile Photo</label>
                     <div class="flex items-center space-x-4">
-                        <div id="photo-preview-container" class="w-16 h-16 rounded-full bg-slate-100 border-2 border-slate-300 overflow-hidden flex items-center justify-center flex-shrink-0 relative">
+                        <div class="w-16 h-16 rounded-full bg-slate-100 border-2 border-slate-300 overflow-hidden flex items-center justify-center">
                             <img id="photo-preview-img" src="" alt="Preview" class="w-full h-full object-cover hidden">
-                            <i data-lucide="user" id="photo-preview-fallback" class="w-8 h-8 text-slate-400"></i>
+                            <span id="photo-preview-fallback" class="text-xs text-slate-400">No Photo</span>
                         </div>
                         <div class="flex-1 space-y-1 text-xs">
-                            <input type="file" id="edit-photo-file" accept="image/*" onchange="handlePhotoUpload(this)" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-800 hover:file:bg-brand-100">
-                            <div class="text-[10px] text-slate-400">or paste direct image URL:</div>
-                            <input type="text" id="edit-photo-url" placeholder="https://example.com/photo.jpg" oninput="previewPhotoUrl(this.value)" class="w-full p-1.5 bg-slate-50 border rounded-md text-xs">
+                            <input type="file" accept="image/*" onchange="handlePhotoUpload(this)" class="block w-full text-xs text-slate-500">
+                            <input type="text" id="edit-photo-url" placeholder="Or paste image URL" oninput="previewPhotoUrl(this.value)" class="w-full p-1.5 border rounded text-xs">
                         </div>
                     </div>
                 </div>
 
-                <!-- Primary Fields -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Full Name *</label>
-                        <input type="text" id="edit-name" required class="w-full p-2 bg-slate-50 border rounded-lg text-sm focus:ring-1 focus:ring-gold-500 focus:outline-none">
+                        <input type="text" id="edit-name" required class="w-full p-2 border rounded text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Role / Relation</label>
-                        <input type="text" id="edit-role" placeholder="e.g. Son, Daughter, Grandchild" class="w-full p-2 bg-slate-50 border rounded-lg text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Status</label>
-                        <select id="edit-status" class="w-full p-2 bg-slate-50 border rounded-lg text-sm">
-                            <option value="Alive">Alive</option>
-                            <option value="Deceased">Deceased</option>
-                            <option value="Head Deceased">Head Deceased</option>
-                        </select>
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Spouse Name</label>
+                        <input type="text" id="edit-spouse" placeholder="Spouse Name" class="w-full p-2 border rounded text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Age</label>
-                        <input type="number" id="edit-age" placeholder="e.g. 25" class="w-full p-2 bg-slate-50 border rounded-lg text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Birth Badge</label>
-                        <input type="text" id="edit-badge" placeholder="e.g. Eldest Daughter" class="w-full p-2 bg-slate-50 border rounded-lg text-sm">
+                        <input type="number" id="edit-age" placeholder="Age" class="w-full p-2 border rounded text-sm">
                     </div>
                 </div>
 
-                <!-- Spouse Fields -->
-                <div id="spouse-fields-group" class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-                    <span class="text-xs font-bold text-brand-900 block border-b pb-1">Spouse Information</span>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-500">Spouse Name</label>
-                            <input type="text" id="edit-spouse" placeholder="Spouse Name" class="w-full p-1.5 bg-white border rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-500">Spouse Age</label>
-                            <input type="number" id="edit-spouse-age" placeholder="Age" class="w-full p-1.5 bg-white border rounded text-xs">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-2 flex items-center justify-end space-x-2">
-                    <button type="button" onclick="closeModal('modal-edit-member')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-300">Cancel</button>
-                    <button type="submit" class="px-5 py-2 bg-brand-800 text-white text-xs font-bold rounded-lg hover:bg-brand-900 shadow">Save Details</button>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="closeModal('modal-edit-member')" class="px-4 py-2 bg-slate-200 text-xs font-bold rounded">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-800 text-white text-xs font-bold rounded">Save Details</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Export & Google Sheet Sync Modal -->
-    <div id="modal-sync" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-200 relative animate-fadeIn space-y-4">
-            <button onclick="closeModal('modal-sync')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-
-            <div class="space-y-1">
-                <h3 class="text-xl font-bold text-slate-900 font-serif-title">Google Sheets & Backup Sync</h3>
-                <p class="text-xs text-slate-500">Export family tree data into CSV format for Google Sheets, or backup/restore locally.</p>
-            </div>
-
-            <div class="space-y-3 pt-2">
-                <button onclick="exportToCSV()" class="w-full p-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-xl text-emerald-900 font-semibold text-xs flex items-center justify-between transition-colors">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="download" class="w-4 h-4 text-emerald-600"></i>
-                        <span>Download CSV File (Google Sheets Format)</span>
-                    </div>
-                    <i data-lucide="chevron-right" class="w-4 h-4 text-emerald-500"></i>
-                </button>
-
-                <button onclick="exportJSONBackup()" class="w-full p-3 bg-blue-50 hover:bg-blue-100 border border-blue-300 rounded-xl text-blue-900 font-semibold text-xs flex items-center justify-between transition-colors">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="file-json" class="w-4 h-4 text-blue-600"></i>
-                        <span>Backup Full Data (JSON File)</span>
-                    </div>
-                    <i data-lucide="chevron-right" class="w-4 h-4 text-blue-500"></i>
-                </button>
-
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <label class="block text-xs font-bold text-slate-700">Restore Data Backup (JSON File):</label>
-                    <input type="file" id="import-json-file" accept=".json" onchange="importJSONBackup(this)" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-200">
-                </div>
-
-                <button onclick="resetToDefaultData()" class="w-full p-2 text-rose-600 hover:text-rose-800 text-xs text-center font-medium underline">
-                    Reset All Data to Initial Default State
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Main JavaScript Logic & Dynamic State -->
     <script>
-        // Initial Default Family Tree Data
-        const defaultFamilyData = {
-            root: {
-                id: "root",
-                head: "Late Shri Gopal Rao Chirnjivlu Naidu",
-                spouse: "Late Smt. Narayan Amma",
-                photo: "",
-                spousePhoto: "",
-                title: "Patriarch & Matriarch",
-                desc: "Founders of the Naidu Family Lineage",
-                childrenCount: 13
-            },
+        let familyData = JSON.parse(localStorage.getItem('naidu_family_tree_db')) || {
+            root: { head: "Late Shri Gopal Rao Chirnjivlu Naidu", spouse: "Late Smt. Narayan Amma", photo: "", spousePhoto: "" },
             branches: [
                 {
-                    id: "b1",
-                    branchNum: 1,
-                    head: "Late Shri R. Krishna Rao Gopal Rao Naidu",
-                    spouse: "R. Pushplata Rao",
-                    spouseAge: 88,
-                    photo: "",
-                    spousePhoto: "",
-                    status: "Head Deceased / Spouse Alive",
-                    children: [
-                        { name: "Arun Kumar Naidu", role: "Son", photo: "", grandchildren: [] },
-                        { name: "Vijay Kumar Naidu", role: "Son", photo: "", grandchildren: [] }
-                    ]
-                },
-                {
-                    id: "b2",
-                    branchNum: 2,
-                    head: "Late Smt. K. Kamla Rao",
-                    spouse: "Late Shri Gopal Rao Naidu",
-                    photo: "",
-                    spousePhoto: "",
-                    status: "Deceased",
-                    children: [
-                        { name: "Umashankar Naidu", role: "Son", photo: "", grandchildren: [] }
-                    ]
-                },
-                {
-                    id: "b3",
-                    branchNum: 3,
-                    head: "Late Shri R. Venu Rao Gopal Rao Naidu",
-                    spouse: "Late Smt. Venu Rao Naidu",
-                    photo: "",
-                    spousePhoto: "",
-                    status: "Deceased",
-                    children: [
-                        { name: "Shrinivas Rao", role: "Son", photo: "", grandchildren: [] },
-                        { name: "Shiv Narayan Rao", role: "Son", photo: "", grandchildren: [] }
-                    ]
-                },
-                {
-                    id: "b4",
-                    branchNum: 4,
-                    head: "Late Shri R. Prabhakar Rao Gopal Rao Naidu",
-                    spouse: "Late Smt. Nirmala Rao",
-                    photo: "",
-                    spousePhoto: "",
-                    status: "Deceased",
-                    children: [
-                        { name: "Anjana Rao", role: "Daughter", photo: "", grandchildren: [] },
-                        { name: "Kanchana Rao", role: "Daughter", photo: "", grandchildren: [] }
-                    ]
-                },
-                {
-                    id: "b5",
-                    branchNum: 5,
-                    head: "Late Shri R. Bhaskar Rao Gopal Rao Naidu",
-                    spouse: "Smt. Rajeshwari Naidu",
-                    photo: "",
-                    spousePhoto: "",
-                    status: "Head Deceased",
-                    children: [
-                        { name: "Jayshree Naidu", role: "Daughter", birthBadge: "Eldest Daughter", photo: "", grandchildren: [] },
-                        { name: "Manju Naidu", role: "Daughter", birthBadge: "Daughter", photo: "", grandchildren: [] },
-                        { name: "Dinesh Naidu", role: "Son", birthBadge: "Youngest Son", photo: "", grandchildren: [] }
-                    ]
-                },
-                {
-                    id: "b6",
-                    branchNum: 6,
-                    head: "Late Shri R. Raja Rao Gopal Rao Naidu",
-                    spouse: "Late Smt. R. Vimal Naidu",
-                    photo: "",
-                    spousePhoto: "",
-                    status: "Deceased",
-                    children: [
-                        { name: "Santosh Naidu", role: "Son", age: 54, photo: "", grandchildren: [] },
-                        { name: "Sushil Naidu", role: "Son", age: 52, photo: "", grandchildren: [] },
-                        { name: "Ragini Naidu", role: "Daughter", age: 51, photo: "", grandchildren: [] }
-                    ]
-                },
-                {
-                    id: "b7",
-                    branchNum: 7,
-                    head: "Smt. P. Vijaylaxmi Naidu",
-                    spouse: "Late Shri Gopal Rao Naidu",
-                    photo: "",
-                    spousePhoto: "",
-                    status: "Alive",
-                    children: [
-                        { name: "Veena Naidu", role: "Daughter", photo: "", grandchildren: [] },
-                        { name: "Deepa Naidu", role: "Daughter", photo: "", grandchildren: [] },
-                        { name: "Madhuri Naidu", role: "Daughter", photo: "", grandchildren: [] }
-                    ]
-                },
-                {
-                    id: "b8",
-                    branchNum: 8,
-                    head: "Late Shri Ramchandra Rao Gopal Rao Naidu",
-                    spouse: "Late Smt. Ramchandra Rao Naidu",
-                    photo: "",
-                    spousePhoto: "",
-                    status: "Deceased",
-                    children: [
-                        { name: "Rajesh Naidu", role: "Son", photo: "", grandchildren: [] },
-                        { name: "Sunita Naidu", role: "Daughter", photo: "", grandchildren: [] }
-                    ]
-                },
-                {
-                    id: "b9",
-                    branchNum: 9,
-                    head: "Shri Laxman Rao Gopal Rao Naidu",
-                    spouse: "Late Smt. Laxman Rao Naidu",
-                    photo: "",
-                    spousePhoto: "",
-                    status: "Alive",
-                    children: [
-                        { name: "Kirti Naidu", role: "Daughter", photo: "", grandchildren: [] }
-                    ]
-                },
-                {
-                    id: "b10",
-                    branchNum: 10,
-                    head: "Shri Chirnjiv Gopal Rao Naidu",
-                    spouse: "Smt. Chirnjiv Gopal Rao Naidu",
-                    photo: "",
-                    spousePhoto: "",
-                    status: "Alive",
-                    children: [
-                        { name: "Jayant Naidu", role: "Son", photo: "", grandchildren: [] },
-                        { name: "Madhvi Naidu", role: "Daughter", photo: "", grandchildren: [] }
-                    ]
-                },
-                {
-                    id: "b11",
-                    branchNum: 11,
-                    head: "Shri Suryaprakash Rao Gopal Rao Naidu",
-                    spouse: "Smt. Suryaprakash Rao Naidu",
-                    photo: "",
-                    spousePhoto: "",
-                    status: "Alive",
-                    children: [
-                        { name: "Manoj Naidu", role: "Son", photo: "", grandchildren: [] },
-                        { name: "Sangeeta Naidu", role: "Daughter", photo: "", grandchildren: [] },
-                        { name: "Ravi Naidu", role: "Son", photo: "", grandchildren: [] }
-                    ]
-                },
-                {
-                    id: "b12",
-                    branchNum: 12,
-                    head: "Shri Shankar Rao Naidu",
-                    spouse: "Smt. P. Rameshwari",
-                    photo: "",
-                    spousePhoto: "",
-                    status: "Alive",
+                    id: "b12", branchNum: 12, head: "Shri Shankar Rao Naidu", spouse: "Smt. P. Rameshwari", status: "Alive",
                     children: [
                         { 
-                            name: "Neeta Naidu", 
-                            role: "Daughter",
-                            spouse: "V. Mukesh Rao",
-                            photo: "",
+                            name: "Neeta Naidu", role: "Daughter", spouse: "V. Mukesh Rao", photo: "",
                             grandchildren: [
                                 { name: "V. Miloni", spouse: "", age: null, photo: "" },
                                 { name: "V. Nirav", spouse: "", age: null, photo: "" }
                             ]
-                        },
-                        { 
-                            name: "Leena Naidu", 
-                            role: "Daughter",
-                            spouse: "Addanky Anil",
-                            photo: "",
-                            grandchildren: [
-                                { name: "Addanky Bhavya", spouse: "", age: null, photo: "" },
-                                { name: "Addanky Kinjal", spouse: "", age: null, photo: "" }
-                            ]
-                        },
-                        { 
-                            name: "Neelkanth Naidu", 
-                            role: "Son",
-                            spouse: "J. Harika",
-                            photo: "",
-                            grandchildren: [
-                                { name: "Vartika Naidu", spouse: "", age: null, photo: "" }
-                            ]
                         }
-                    ]
-                },
-                {
-                    id: "b13",
-                    branchNum: 13,
-                    head: "Late Shri Venkat Rao Gopal Rao Naidu",
-                    spouse: "Late Smt. Laxmi Naidu",
-                    photo: "",
-                    spousePhoto: "",
-                    status: "Deceased",
-                    children: [
-                        { name: "Abhishek Naidu", role: "Son", photo: "", grandchildren: [] },
-                        { name: "Samyukta Naidu", role: "Daughter", photo: "", grandchildren: [] },
-                        { name: "Divya Naidu", role: "Daughter", photo: "", grandchildren: [] }
                     ]
                 }
             ]
         };
 
-        // State Management
-        let familyData = loadFamilyData();
         let isAdminLoggedIn = false;
         let currentView = 'home';
         let tempPhotoBase64 = "";
 
-        // Persistent Local Storage Handler
-        function loadFamilyData() {
-            try {
-                const stored = localStorage.getItem('naidu_family_tree_db');
-                if (stored) return JSON.parse(stored);
-            } catch (e) {
-                console.error("Failed to load local storage:", e);
-            }
-            return JSON.parse(JSON.stringify(defaultFamilyData));
-        }
+        window.addEventListener('DOMContentLoaded', () => { renderView(); });
 
-        function saveFamilyData() {
-            try {
-                localStorage.setItem('naidu_family_tree_db', JSON.stringify(familyData));
-            } catch (e) {
-                alert("Storage limit reached for photos. Try using smaller compressed images or photo URLs.");
-            }
-        }
+        function navigateTo(v) { currentView = v; renderView(); window.scrollTo(0,0); }
 
-        // Initialize Application
-        window.addEventListener('DOMContentLoaded', () => {
-            renderView();
-            window.addEventListener('resize', drawConnectorLines);
-            
-            document.addEventListener('click', (e) => {
-                const searchInput = document.getElementById('global-search');
-                if (searchInput && searchInput.parentElement && !searchInput.parentElement.contains(e.target)) {
-                    document.getElementById('search-results-dropdown').classList.add('hidden');
-                }
-            });
-        });
-
-        // Navigation Router
-        function navigateTo(viewId) {
-            currentView = viewId;
-            renderView();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Render Page Views
         function renderView() {
             const container = document.getElementById('app-container');
-            
             if (currentView === 'home') {
-                container.innerHTML = renderHomeMainTree();
-                setTimeout(drawConnectorLines, 100);
+                container.innerHTML = `<div class="text-center py-10"><h2 class="text-2xl font-bold">Select a Branch below</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">` +
+                    familyData.branches.map(b => `<div onclick="navigateTo('${b.id}')" class="bg-white p-5 rounded-xl shadow cursor-pointer border hover:border-gold-500"><h3 class="font-bold">${b.head}</h3><p class="text-xs text-slate-500">Branch #${b.branchNum}</p></div>`).join('') +
+                `</div></div>`;
             } else {
-                const branch = familyData.branches.find(b => b.id === currentView);
-                if (branch) {
-                    container.innerHTML = renderBranchPage(branch);
-                } else {
-                    container.innerHTML = `<div class="text-center py-20 text-slate-500">Branch not found. <button onclick="navigateTo('home')" class="text-brand-500 underline">Return Home</button></div>`;
-                }
-            }
-            
-            lucide.createIcons();
-            updateAdminUIState();
-        }
-
-        // Avatar Helper Generator
-        function renderAvatar(photoUrl, name, sizeClass = "w-12 h-12") {
-            if (photoUrl) {
-                return `<img src="${photoUrl}" alt="${name}" class="${sizeClass} rounded-full object-cover border-2 border-gold-400 shadow-sm flex-shrink-0">`;
-            }
-            const initial = name ? name.charAt(0).toUpperCase() : '?';
-            return `
-                <div class="${sizeClass} rounded-full bg-gradient-to-tr from-brand-800 to-slate-800 text-gold-400 border-2 border-gold-400/50 flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0">
-                    ${initial}
-                </div>
-            `;
-        }
-
-        // -------------------------------------------------------------
-        // MAIN FAMILY TREE FLOWCHART VIEW
-        // -------------------------------------------------------------
-        function renderHomeMainTree() {
-            return `
-                <div class="space-y-10 relative animate-fadeIn">
-                    <div class="text-center space-y-3 max-w-3xl mx-auto pt-2">
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300">
-                            <i data-lucide="crown" class="w-3.5 h-3.5 mr-1 text-gold-600"></i> Ancestral Lineage Chart
-                        </span>
-                        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                            The Great Naidu Family Tree
-                        </h2>
-                        <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
-                            Click on any branch card to view children, grandchildren, and update profile photos. Login as Admin to add or edit family members.
-                        </p>
-                    </div>
-
-                    <div class="relative min-h-[850px] w-full overflow-x-auto pb-8">
-                        <svg id="svg-connectors" class="tree-connector-svg"></svg>
-
-                        <!-- ROOT NODE -->
-                        <div class="flex justify-center mb-16 relative z-20">
-                            <div id="root-node" class="bg-gradient-to-r from-brand-900 via-slate-900 to-brand-800 text-white rounded-3xl p-6 shadow-2xl border-4 border-gold-400 text-center max-w-xl w-full relative group">
-                                ${isAdminLoggedIn ? `
-                                    <button onclick="openEditModal('root', 'head')" class="absolute top-3 right-3 p-2 bg-amber-500 text-brand-900 rounded-full hover:bg-gold-400 shadow transition-transform hover:scale-110" title="Edit Root">
-                                        <i data-lucide="edit-2" class="w-4 h-4"></i>
-                                    </button>
-                                ` : ''}
-
-                                <div class="flex items-center justify-center space-x-2 text-gold-400 text-xs font-bold uppercase tracking-wider mb-2">
-                                    <i data-lucide="heart" class="w-4 h-4 fill-gold-400"></i>
-                                    <span>Primary Ancestral Root</span>
-                                    <i data-lucide="heart" class="w-4 h-4 fill-gold-400"></i>
-                                </div>
-
-                                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 my-2">
+                const b = familyData.branches.find(x => x.id === currentView);
+                container.innerHTML = `
+                    <div class="space-y-6">
+                        <button onclick="navigateTo('home')" class="text-xs text-brand-800 font-bold">&larr; Back to Home</button>
+                        <h2 class="text-2xl font-bold">${b.head}</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${b.children.map((c, cIdx) => `
+                                <div class="bg-white p-4 rounded-xl border shadow-sm space-y-3">
                                     <div class="flex items-center space-x-3">
-                                        ${renderAvatar(familyData.root.photo, familyData.root.head, "w-14 h-14")}
-                                        <div class="text-left">
-                                            <h3 class="text-base sm:text-lg font-bold font-serif-title text-amber-100">${familyData.root.head}</h3>
-                                            <span class="text-xs text-amber-200/70 block">Patriarch</span>
-                                        </div>
+                                        <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-200">${c.photo ? `<img src="${c.photo}" class="w-full h-full object-cover">` : ''}</div>
+                                        <div><h4 class="font-bold">${c.name}</h4><p class="text-xs text-slate-500">m. ${c.spouse || 'N/A'}</p></div>
                                     </div>
-                                    <span class="text-gold-400 font-serif font-bold text-xl">&</span>
-                                    <div class="flex items-center space-x-3">
-                                        ${renderAvatar(familyData.root.spousePhoto, familyData.root.spouse, "w-14 h-14")}
-                                        <div class="text-left">
-                                            <h3 class="text-base sm:text-lg font-bold font-serif-title text-amber-100">${familyData.root.spouse}</h3>
-                                            <span class="text-xs text-amber-200/70 block">Matriarch</span>
+                                    <div class="border-t pt-2">
+                                        <div class="flex justify-between items-center text-xs font-bold mb-2">
+                                            <span>Grandchildren (${c.grandchildren ? c.grandchildren.length : 0})</span>
+                                            ${isAdminLoggedIn ? `<button onclick="openAddGrandchildModal('${b.id}', ${cIdx})" class="text-brand-800">+ Add Grandchild</button>` : ''}
                                         </div>
-                                    </div>
-                                </div>
-
-                                <div class="mt-3 inline-block bg-gold-500/20 text-gold-300 text-xs px-3 py-1 rounded-full border border-gold-500/40 font-medium">
-                                    13 Primary Branches Ancestry
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 13 BRANCHES GRID -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 relative z-20">
-                            ${familyData.branches.map(branch => renderBranchCardNode(branch)).join('')}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderBranchCardNode(b) {
-            const isAlive = b.status.includes('Alive');
-            return `
-                <div id="node-${b.id}" class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-xl border border-slate-200 hover:border-gold-500 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
-                    <div class="absolute top-0 left-0 right-0 h-1.5 ${isAlive ? 'bg-emerald-500' : 'bg-brand-800'}"></div>
-                    <div>
-                        <div class="flex items-center justify-between mb-3 text-xs">
-                            <span class="font-bold text-brand-800 bg-brand-50 px-2.5 py-1 rounded-md border border-brand-100 flex items-center space-x-1">
-                                <i data-lucide="git-branch" class="w-3.5 h-3.5 text-gold-600"></i>
-                                <span>Branch #${b.branchNum}</span>
-                            </span>
-                            <div class="flex items-center space-x-2">
-                                <span class="text-slate-500 text-[11px] font-medium">${b.status}</span>
-                                ${isAdminLoggedIn ? `
-                                    <button onclick="openEditModal('${b.id}', 'head')" class="p-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-md transition-colors" title="Edit Head">
-                                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                                    </button>
-                                ` : ''}
-                            </div>
-                        </div>
-
-                        <div class="flex items-center space-x-3 mb-3 cursor-pointer" onclick="navigateTo('${b.id}')">
-                            ${renderAvatar(b.photo, b.head, "w-12 h-12")}
-                            <div class="min-w-0 flex-1">
-                                <h4 class="font-bold text-slate-900 text-base group-hover:text-brand-800 transition-colors leading-snug truncate">${b.head}</h4>
-                                <div class="text-xs text-slate-600 flex items-center space-x-1 mt-0.5">
-                                    <i data-lucide="heart" class="w-3 h-3 text-rose-500 flex-shrink-0"></i>
-                                    <span class="truncate">${b.spouse || 'N/A'}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 pt-3 border-t border-slate-100">
-                            <div class="flex items-center justify-between mb-2">
-                                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Children (${b.children.length})</p>
-                                ${isAdminLoggedIn ? `
-                                    <button onclick="openAddChildModal('${b.id}')" class="text-[11px] text-brand-800 font-bold hover:underline">+ Add</button>
-                                ` : ''}
-                            </div>
-                            <div class="flex flex-wrap gap-1.5">
-                                ${b.children.map(child => `
-                                    <div class="inline-flex items-center text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded-md border border-slate-200 space-x-1">
-                                        ${renderAvatar(child.photo, child.name, "w-4 h-4")}
-                                        <span class="font-medium">${child.name}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-brand-800 group-hover:text-gold-600 transition-colors cursor-pointer" onclick="navigateTo('${b.id}')">
-                        <span>Open Detailed Branch Page</span>
-                        <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
-                    </div>
-                </div>
-            `;
-        }
-
-        function drawConnectorLines() {
-            const svg = document.getElementById('svg-connectors');
-            const rootNode = document.getElementById('root-node');
-            if (!svg || !rootNode) return;
-
-            svg.innerHTML = '';
-            const rootRect = rootNode.getBoundingClientRect();
-            const svgRect = svg.getBoundingClientRect();
-
-            const startX = (rootRect.left + rootRect.width / 2) - svgRect.left;
-            const startY = (rootRect.bottom) - svgRect.top;
-
-            familyData.branches.forEach(branch => {
-                const nodeElem = document.getElementById(`node-${branch.id}`);
-                if (!nodeElem) return;
-
-                const nodeRect = nodeElem.getBoundingClientRect();
-                const endX = (nodeRect.left + nodeRect.width / 2) - svgRect.left;
-                const endY = (nodeRect.top) - svgRect.top;
-
-                const deltaY = endY - startY;
-                const pathD = `M ${startX} ${startY} C ${startX} ${startY + deltaY * 0.4}, ${endX} ${endY - deltaY * 0.4}, ${endX} ${endY}`;
-
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                path.setAttribute('d', pathD);
-                path.setAttribute('stroke', '#cbd5e1');
-                path.setAttribute('stroke-width', '2');
-                path.setAttribute('fill', 'none');
-                path.setAttribute('stroke-dasharray', '4,4');
-                svg.appendChild(path);
-            });
-        }
-
-        // -------------------------------------------------------------
-        // DETAILED BRANCH FAMILY PAGE VIEW
-        // -------------------------------------------------------------
-        function renderBranchPage(b) {
-            return `
-                <div class="space-y-8 animate-fadeIn">
-                    <nav class="flex items-center space-x-2 text-xs sm:text-sm text-slate-500">
-                        <button onclick="navigateTo('home')" class="hover:text-brand-800 flex items-center space-x-1">
-                            <i data-lucide="home" class="w-4 h-4"></i>
-                            <span>Main Tree</span>
-                        </button>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-                        <span class="text-slate-400">Branch #${b.branchNum}</span>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-                        <span class="font-semibold text-brand-900">${b.head}</span>
-                    </nav>
-
-                    <div class="bg-gradient-to-r from-brand-900 via-slate-900 to-brand-800 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-gold-500/20 relative overflow-hidden">
-                        <div class="relative z-10 space-y-4">
-                            <div class="flex flex-wrap items-center justify-between gap-3">
-                                <span class="bg-gold-500 text-brand-900 font-bold text-xs uppercase px-3 py-1 rounded-full tracking-wider">
-                                    Primary Branch #${b.branchNum}
-                                </span>
-                                <div class="flex items-center space-x-2">
-                                    <span class="text-slate-300 text-xs sm:text-sm">Status: ${b.status}</span>
-                                    ${isAdminLoggedIn ? `
-                                        <button onclick="openEditModal('${b.id}', 'head')" class="px-3 py-1 bg-amber-500 text-brand-900 font-bold text-xs rounded-lg hover:bg-gold-400 shadow">Edit Head</button>
-                                    ` : ''}
-                                </div>
-                            </div>
-
-                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2">
-                                ${renderAvatar(b.photo, b.head, "w-20 h-20")}
-                                <div>
-                                    <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-100 font-serif-title leading-tight">${b.head}</h2>
-                                    <div class="mt-2 flex flex-wrap items-center gap-4 text-xs sm:text-sm text-amber-200/90">
-                                        <div class="flex items-center space-x-1.5">
-                                            <i data-lucide="heart" class="w-4 h-4 text-rose-400"></i>
-                                            <span>Spouse: <strong>${b.spouse}</strong></span>
-                                            ${b.spouseAge ? `<span class="bg-rose-500/30 text-rose-200 text-xs px-2 py-0.5 rounded-full">Age: ${b.spouseAge}</span>` : ''}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Children & Grandchildren Section -->
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-bold text-slate-900 font-serif-title flex items-center space-x-2">
-                                <i data-lucide="users" class="w-5 h-5 text-brand-800"></i>
-                                <span>Children & Grandchildren (${b.children.length})</span>
-                            </h3>
-
-                            ${isAdminLoggedIn ? `
-                                <button onclick="openAddChildModal('${b.id}')" class="px-3 py-1.5 bg-brand-800 text-white font-bold text-xs rounded-lg hover:bg-brand-900 flex items-center space-x-1">
-                                    <i data-lucide="plus" class="w-4 h-4 text-gold-400"></i>
-                                    <span>Add Child</span>
-                                </button>
-                            ` : ''}
-                        </div>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            ${b.children.map((child, cIdx) => `
-                                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 relative group">
-                                    
-                                    ${isAdminLoggedIn ? `
-                                        <div class="absolute top-3 right-3 flex items-center space-x-1 bg-white/90 p-1 rounded-lg border shadow-sm">
-                                            <button onclick="openEditModal('${b.id}', 'child', ${cIdx})" class="p-1 text-slate-600 hover:text-brand-800" title="Edit Child"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
-                                            <button onclick="deleteMember('${b.id}', 'child', ${cIdx})" class="p-1 text-rose-600 hover:text-rose-800" title="Delete Child"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                                        </div>
-                                    ` : ''}
-
-                                    <div class="flex items-start space-x-4">
-                                        ${renderAvatar(child.photo, child.name, "w-14 h-14")}
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex items-center space-x-1.5 flex-wrap">
-                                                <h4 class="font-bold text-slate-900 text-base leading-snug">${child.name}</h4>${child.birthBadge ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">${child.birthBadge}</span>` : ''}
-                                            </div>
-                                            <p class="text-xs text-slate-500 mt-0.5">Relation: ${child.role \vert{}\vert{} 'Member'}</p>${child.spouse ? `
-                                                <div class="mt-1 text-xs text-slate-600 flex items-center space-x-1">
-                                                    <i data-lucide="heart" class="w-3 h-3 text-rose-500"></i>
-                                                    <span>m. <strong>${child.spouse}</strong></span>
-                                                </div>
-                                            ` : ''}
-                                            ${child.age ? `<div class="mt-2 inline-flex items-center space-x-1 bg-amber-50 text-amber-800 text-xs font-semibold px-2 py-0.5 rounded-full border border-amber-200"><span>Age: ${child.age} yrs</span></div>` : ''}
-                                        </div>
-                                    </div>
-
-                                    <!-- Grandchildren Subsection with Photos -->
-                                    <div class="pt-3 border-t border-slate-100 space-y-3">
-                                        <div class="flex items-center justify-between">
-                                            <p class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center space-x-1">
-                                                <i data-lucide="baby" class="w-4 h-4 text-gold-600"></i>
-                                                <span>Grandchildren (${child.grandchildren ? child.grandchildren.length : 0})</span>
-                                            </p>
-                                            ${isAdminLoggedIn ? `
-                                                <button onclick="openAddGrandchildModal('${b.id}', ${cIdx})" class="text-xs text-brand-800 font-bold hover:underline flex items-center space-x-1">
-                                                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
-                                                    <span>Add Grandchild</span>
-                                                </button>
-                                            ` : ''}
-                                        </div>
-
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                            ${child.grandchildren && child.grandchildren.length > 0 ? child.grandchildren.map((gc, gcIdx) => `
-                                                <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 flex items-center justify-between relative group/gc">
-                                                    <div class="flex items-center space-x-2.5 min-w-0">
-                                                        ${renderAvatar(gc.photo, gc.name, "w-10 h-10")}
-                                                        <div class="min-w-0">
-                                                            <p class="font-bold text-slate-900 text-xs truncate">${gc.name}</p>
-                                                            ${gc.spouse ? `<p class="text-[11px] text-slate-500 truncate">m. ${gc.spouse}</p>` : ''}
-                                                            ${gc.age ? `<span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded">Age: ${gc.age}</span>` : ''}
-                                                        </div>
+                                        <div class="space-y-2">
+                                            ${c.grandchildren && c.grandchildren.length > 0 ? c.grandchildren.map((gc, gcIdx) => `
+                                                <div class="bg-slate-50 p-2 rounded border flex items-center justify-between">
+                                                    <div class="flex items-center space-x-2">
+                                                        <div class="w-8 h-8 rounded-full overflow-hidden bg-slate-200">${gc.photo ? `<img src="${gc.photo}" class="w-full h-full object-cover">` : ''}</div>
+                                                        <div><p class="text-xs font-bold">${gc.name}</p>${gc.spouse ? `<p class="text-[10px] text-slate-500">m. ${gc.spouse}</p>` : ''}</div>
                                                     </div>
-
-                                                    ${isAdminLoggedIn ? `
-                                                        <div class="flex items-center space-x-1 opacity-80 group-hover/gc:opacity-100">
-                                                            <button onclick="openEditModal('${b.id}', 'grandchild', ${cIdx},${gcIdx})" class="p-1 text-slate-600 hover:text-brand-800" title="Edit Grandchild"><i data-lucide="edit-3" class="w-3 h-3"></i></button>
-                                                            <button onclick="deleteGrandchild('${b.id}', ${cIdx},${gcIdx})" class="p-1 text-rose-600 hover:text-rose-800" title="Delete Grandchild"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
-                                                        </div>
-                                                    ` : ''}
+                                                    ${isAdminLoggedIn ? `<button onclick="openEditModal('${b.id}', 'grandchild', ${cIdx},${gcIdx})" class="text-xs text-brand-800 font-bold underline">Edit/Photo</button>` : ''}
                                                 </div>
-                                            `).join('') : '<p class="text-xs text-slate-400 italic">No recorded grandchildren yet.</p>'}
+                                            `).join('') : '<p class="text-xs text-slate-400 italic">No grandchildren added yet.</p>'}
                                         </div>
                                     </div>
                                 </div>
                             `).join('')}
                         </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // -------------------------------------------------------------
-        // ADMIN AUTHORIZATION & MODAL HANDLERS
-        // -------------------------------------------------------------
-        function toggleAdminModal() {
-            if (isAdminLoggedIn) {
-                logoutAdmin();
-            } else {
-                openModal('modal-admin-login');
-            }
-        }
-
-        function verifyAdminPin(e) {
-            e.preventDefault();
-            const pinInput = document.getElementById('admin-pin-input').value;
-            if (pinInput === '1234') {
-                isAdminLoggedIn = true;
-                closeModal('modal-admin-login');
-                document.getElementById('admin-pin-input').value = '';
-                document.getElementById('pin-error-msg').classList.add('hidden');
-                updateAdminUIState();
-                renderView();
-            } else {
-                document.getElementById('pin-error-msg').classList.remove('hidden');
-            }
-        }
-
-        function logoutAdmin() {
-            isAdminLoggedIn = false;
-            updateAdminUIState();
-            renderView();
-        }
-
-        function updateAdminUIState() {
-            const btnText = document.getElementById('admin-btn-text');
-            const adminIcon = document.getElementById('admin-icon');
-            const banner = document.getElementById('admin-banner');
-
-            if (isAdminLoggedIn) {
-                btnText.textContent = "Admin Active";
-                adminIcon.setAttribute('data-lucide', 'unlock');
-                banner.classList.remove('hidden');
-            } else {
-                btnText.textContent = "Admin Login";
-                adminIcon.setAttribute('data-lucide', 'lock');
-                banner.classList.add('hidden');
+                    </div>`;
             }
             lucide.createIcons();
+            document.getElementById('admin-banner').classList.toggle('hidden', !isAdminLoggedIn);
+            document.getElementById('admin-btn-text').textContent = isAdminLoggedIn ? "Admin Active" : "Admin Login";
         }
 
-        // -------------------------------------------------------------
-        // EDIT & ADD MEMBER MODAL LOGIC
-        // -------------------------------------------------------------
-        function openEditModal(branchId, type, childIdx = null, gcIdx = null) {
+        function toggleAdminModal() {
+            if (isAdminLoggedIn) { logoutAdmin(); } 
+            else { const pin = prompt("Enter Admin PIN (1234):"); if(pin === '1234') { isAdminLoggedIn = true; renderView(); } else if(pin) alert("Incorrect PIN"); }
+        }
+        function logoutAdmin() { isAdminLoggedIn = false; renderView(); }
+
+        function openEditModal(branchId, type, childIdx, gcIdx) {
             document.getElementById('edit-branch-id').value = branchId;
             document.getElementById('edit-member-type').value = type;
-            document.getElementById('edit-child-index').value = childIdx !== null ? childIdx : '';
-            document.getElementById('edit-gc-index').value = gcIdx !== null ? gcIdx : '';
+            document.getElementById('edit-child-index').value = childIdx;
+            document.getElementById('edit-gc-index').value = gcIdx;
             tempPhotoBase64 = "";
 
-            let memberObj = null;
+            const branch = familyData.branches.find(b => b.id === branchId);
+            const gc = branch.children[childIdx].grandchildren[gcIdx];
 
-            if (branchId === 'root') {
-                memberObj = familyData.root;
-            } else {
-                const branch = familyData.branches.find(b => b.id === branchId);
-                if (type === 'head') {
-                    memberObj = branch;
-                } else if (type === 'child') {
-                    memberObj = branch.children[childIdx];
-                } else if (type === 'grandchild') {
-                    memberObj = branch.children[childIdx].grandchildren[gcIdx];
-                }
-            }
-
-            if (!memberObj) return;
-
-            document.getElementById('edit-modal-title').textContent = `Edit Details: ${memberObj.head || memberObj.name}`;
-            document.getElementById('edit-name').value = memberObj.head || memberObj.name || '';
-            document.getElementById('edit-role').value = memberObj.role || (type === 'head' ? 'Branch Head' : type === 'grandchild' ? 'Grandchild' : '');
-            document.getElementById('edit-status').value = memberObj.status || 'Alive';
-            document.getElementById('edit-age').value = memberObj.age || '';
-            document.getElementById('edit-badge').value = memberObj.birthBadge || '';
-            document.getElementById('edit-spouse').value = memberObj.spouse || '';
-            document.getElementById('edit-spouse-age').value = memberObj.spouseAge || '';
-            document.getElementById('edit-photo-url').value = memberObj.photo || '';
-
-            previewPhotoUrl(memberObj.photo || '');
-            openModal('modal-edit-member');
-        }
-
-        function openAddChildModal(branchId) {
-            document.getElementById('edit-branch-id').value = branchId;
-            document.getElementById('edit-member-type').value = 'new_child';
-            document.getElementById('edit-child-index').value = '';
-            document.getElementById('edit-gc-index').value = '';
-            tempPhotoBase64 = "";
-
-            document.getElementById('edit-modal-title').textContent = "Add New Child";
-            document.getElementById('edit-name').value = '';
-            document.getElementById('edit-role').value = 'Son';
-            document.getElementById('edit-status').value = 'Alive';
-            document.getElementById('edit-age').value = '';
-            document.getElementById('edit-badge').value = '';
-            document.getElementById('edit-spouse').value = '';
-            document.getElementById('edit-spouse-age').value = '';
-            document.getElementById('edit-photo-url').value = '';
-
-            previewPhotoUrl('');
-            openModal('modal-edit-member');
+            document.getElementById('edit-modal-title').textContent = `Edit Grandchild: ${gc.name}`;
+            document.getElementById('edit-name').value = gc.name || '';
+            document.getElementById('edit-spouse').value = gc.spouse || '';
+            document.getElementById('edit-age').value = gc.age || '';
+            document.getElementById('edit-photo-url').value = gc.photo || '';
+            previewPhotoUrl(gc.photo || '');
+            document.getElementById('modal-edit-member').classList.remove('hidden');
         }
 
         function openAddGrandchildModal(branchId, childIdx) {
@@ -978,41 +189,26 @@
 
             document.getElementById('edit-modal-title').textContent = "Add New Grandchild";
             document.getElementById('edit-name').value = '';
-            document.getElementById('edit-role').value = 'Grandchild';
-            document.getElementById('edit-status').value = 'Alive';
-            document.getElementById('edit-age').value = '';
-            document.getElementById('edit-badge').value = '';
             document.getElementById('edit-spouse').value = '';
-            document.getElementById('edit-spouse-age').value = '';
+            document.getElementById('edit-age').value = '';
             document.getElementById('edit-photo-url').value = '';
-
             previewPhotoUrl('');
-            openModal('modal-edit-member');
+            document.getElementById('modal-edit-member').classList.remove('hidden');
         }
 
         function handlePhotoUpload(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    tempPhotoBase64 = e.target.result;
-                    previewPhotoUrl(tempPhotoBase64);
-                };
+                reader.onload = function(e) { tempPhotoBase64 = e.target.result; previewPhotoUrl(tempPhotoBase64); };
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
         function previewPhotoUrl(url) {
-            const previewImg = document.getElementById('photo-preview-img');
-            const previewFallback = document.getElementById('photo-preview-fallback');
-
-            if (url) {
-                previewImg.src = url;
-                previewImg.classList.remove('hidden');
-                previewFallback.classList.add('hidden');
-            } else {
-                previewImg.classList.add('hidden');
-                previewFallback.classList.remove('hidden');
-            }
+            const img = document.getElementById('photo-preview-img');
+            const fallback = document.getElementById('photo-preview-fallback');
+            if (url) { img.src = url; img.classList.remove('hidden'); fallback.classList.add('hidden'); }
+            else { img.classList.add('hidden'); fallback.classList.remove('hidden'); }
         }
 
         function saveMemberChanges(e) {
@@ -1023,243 +219,34 @@
             const gcIdx = document.getElementById('edit-gc-index').value;
 
             const name = document.getElementById('edit-name').value;
-            const role = document.getElementById('edit-role').value;
-            const status = document.getElementById('edit-status').value;
-            const age = document.getElementById('edit-age').value;
-            const badge = document.getElementById('edit-badge').value;
             const spouse = document.getElementById('edit-spouse').value;
-            const spouseAge = document.getElementById('edit-spouse-age').value;
+            const age = document.getElementById('edit-age').value;
             const photoUrl = tempPhotoBase64 || document.getElementById('edit-photo-url').value;
 
-            if (branchId === 'root') {
-                familyData.root.head = name;
-                familyData.root.photo = photoUrl;
-            } else {
-                const branch = familyData.branches.find(b => b.id === branchId);
-                if (type === 'head') {
-                    branch.head = name;
-                    branch.status = status;
-                    branch.spouse = spouse;
-                    if (spouseAge) branch.spouseAge = parseInt(spouseAge);
-                    branch.photo = photoUrl;
-                } else if (type === 'child') {
-                    const child = branch.children[childIdx];
-                    child.name = name;
-                    child.role = role;
-                    if (age) child.age = parseInt(age);
-                    if (badge) child.birthBadge = badge;
-                    child.spouse = spouse;
-                    child.photo = photoUrl;
-                } else if (type === 'grandchild') {
-                    const gc = branch.children[childIdx].grandchildren[gcIdx];
-                    gc.name = name;
-                    if (age) gc.age = parseInt(age);
-                    gc.spouse = spouse;
-                    gc.photo = photoUrl;
-                } else if (type === 'new_child') {
-                    branch.children.push({
-                        name: name,
-                        role: role || 'Member',
-                        age: age ? parseInt(age) : undefined,
-                        birthBadge: badge || undefined,
-                        spouse: spouse || undefined,
-                        photo: photoUrl,
-                        grandchildren: []
-                    });
-                } else if (type === 'new_grandchild') {
-                    if (!branch.children[childIdx].grandchildren) {
-                        branch.children[childIdx].grandchildren = [];
-                    }
-                    branch.children[childIdx].grandchildren.push({
-                        name: name,
-                        spouse: spouse || undefined,
-                        age: age ? parseInt(age) : undefined,
-                        photo: photoUrl
-                    });
-                }
+            const branch = familyData.branches.find(b => b.id === branchId);
+
+            if (type === 'grandchild') {
+                const gc = branch.children[childIdx].grandchildren[gcIdx];
+                gc.name = name;
+                gc.spouse = spouse;
+                if(age) gc.age = parseInt(age);
+                if(photoUrl) gc.photo = photoUrl;
+            } else if (type === 'new_grandchild') {
+                if(!branch.children[childIdx].grandchildren) branch.children[childIdx].grandchildren = [];
+                branch.children[childIdx].grandchildren.push({
+                    name: name,
+                    spouse: spouse,
+                    age: age ? parseInt(age) : null,
+                    photo: photoUrl
+                });
             }
 
-            saveFamilyData();
+            localStorage.setItem('naidu_family_tree_db', JSON.stringify(familyData));
             closeModal('modal-edit-member');
             renderView();
         }
 
-        function deleteMember(branchId, type, childIdx) {
-            if (!confirm("Are you sure you want to remove this family member?")) return;
-            const branch = familyData.branches.find(b => b.id === branchId);
-            if (type === 'child') {
-                branch.children.splice(childIdx, 1);
-                saveFamilyData();
-                renderView();
-            }
-        }
-
-        function deleteGrandchild(branchId, childIdx, gcIdx) {
-            if (!confirm("Are you sure you want to remove this grandchild?")) return;
-            const branch = familyData.branches.find(b => b.id === branchId);
-            branch.children[childIdx].grandchildren.splice(gcIdx, 1);
-            saveFamilyData();
-            renderView();
-        }
-
-        // -------------------------------------------------------------
-        // GOOGLE SHEETS CSV EXPORT & BACKUP LOGIC
-        // -------------------------------------------------------------
-        function openSyncModal() {
-            openModal('modal-sync');
-        }
-
-        function exportToCSV() {
-            let csvRows = [];
-            csvRows.push(["BranchNum", "BranchHead", "HeadStatus", "SpouseName", "ChildName", "ChildRole", "ChildAge", "ChildSpouse", "GrandchildName", "GrandchildSpouse", "GrandchildAge"].join(","));
-
-            familyData.branches.forEach(b => {
-                if (b.children.length === 0) {
-                    csvRows.push([b.branchNum, `"${b.head}"`, `"${b.status}"`, `"${b.spouse || ''}"`, "", "", "", "", "", "", ""].join(","));
-                } else {
-                    b.children.forEach(c => {
-                        if (!c.grandchildren || c.grandchildren.length === 0) {
-                            csvRows.push([b.branchNum, `"${b.head}"`, `"${b.status}"`, `"${b.spouse || ''}"`, `"${c.name}"`, `"${c.role || ''}"`, c.age || "", `"${c.spouse || ''}"`, "", "", ""].join(","));
-                        } else {
-                            c.grandchildren.forEach(gc => {
-                                csvRows.push([
-                                    b.branchNum,
-                                    `"${b.head}"`,
-                                    `"${b.status}"`,
-                                    `"${b.spouse || ''}"`,
-                                    `"${c.name}"`,
-                                    `"${c.role || ''}"`,
-                                    c.age || "",
-                                    `"${c.spouse || ''}"`,
-                                    `"${gc.name}"`,
-                                    `"${gc.spouse || ''}"`,
-                                    gc.age || ""
-                                ].join(","));
-                            });
-                        }
-                    });
-                }
-            });
-
-            const csvString = "data:text/csv;charset=utf-8," + encodeURIComponent(csvRows.join("\n"));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", csvString);
-            downloadAnchor.setAttribute("download", "Naidu_Family_Tree_GoogleSheets.csv");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function exportJSONBackup() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(familyData, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "naidu_family_backup.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function importJSONBackup(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const parsed = JSON.parse(e.target.result);
-                        if (parsed.branches && parsed.root) {
-                            familyData = parsed;
-                            saveFamilyData();
-                            closeModal('modal-sync');
-                            renderView();
-                            alert("Family Data Restored Successfully!");
-                        }
-                    } catch (err) {
-                        alert("Invalid JSON file format.");
-                    }
-                };
-                reader.readAsText(input.files[0]);
-            }
-        }
-
-        function resetToDefaultData() {
-            if (confirm("Reset all custom edits back to original default settings?")) {
-                localStorage.removeItem('naidu_family_tree_db');
-                familyData = JSON.parse(JSON.stringify(defaultFamilyData));
-                closeModal('modal-sync');
-                renderView();
-            }
-        }
-
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
-        // Global Search Logic
-        function handleSearch(query) {
-            const dropdown = document.getElementById('search-results-dropdown');
-            const clearBtn = document.getElementById('search-clear-btn');
-            
-            if (!query || query.trim() === '') {
-                dropdown.classList.add('hidden');
-                clearBtn.classList.add('hidden');
-                return;
-            }
-
-            clearBtn.classList.remove('hidden');
-            const searchTerm = query.toLowerCase().trim();
-            const matches = [];
-
-            familyData.branches.forEach(b => {
-                if (b.head.toLowerCase().includes(searchTerm)) {
-                    matches.push({ name: b.head, type: `Branch #${b.branchNum} Head`, action: () => navigateTo(b.id) });
-                }
-                b.children.forEach(c => {
-                    if (c.name.toLowerCase().includes(searchTerm)) {
-                        matches.push({ name: c.name, type: `Child in Branch #${b.branchNum}`, action: () => navigateTo(b.id) });
-                    }
-                    if (c.grandchildren) {
-                        c.grandchildren.forEach(gc => {
-                            if (gc.name.toLowerCase().includes(searchTerm)) {
-                                matches.push({ name: gc.name, type: `Grandchild in Branch #${b.branchNum}`, action: () => navigateTo(b.id) });
-                            }
-                        });
-                    }
-                });
-            });
-
-            if (matches.length > 0) {
-                dropdown.innerHTML = matches.map((m, idx) => `
-                    <div onclick="executeSearchAction(${idx})" class="p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-none flex items-center justify-between">
-                        <div>
-                            <p class="font-semibold text-slate-800 text-sm">${m.name}</p>
-                            <p class="text-xs text-brand-800">${m.type}</p>
-                        </div>
-                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-400"></i>
-                    </div>
-                `).join('');
-                dropdown.dataset.matches = JSON.stringify(matches);
-                dropdown.classList.remove('hidden');
-            } else {
-                dropdown.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">No matching members found</div>`;
-                dropdown.classList.remove('hidden');
-            }
-            lucide.createIcons();
-        }
-
-        function executeSearchAction(index) {
-            const dropdown = document.getElementById('search-results-dropdown');
-            const matches = JSON.parse(dropdown.dataset.matches || '[]');
-            if (matches[index]) {
-                matches[index].action();
-                dropdown.classList.add('hidden');
-                document.getElementById('global-search').value = '';
-            }
-        }
-
-        function clearSearch() {
-            document.getElementById('global-search').value = '';
-            document.getElementById('search-results-dropdown').classList.add('hidden');
-            document.getElementById('search-clear-btn').classList.add('hidden');
-        }
     </script>
 </body>
 </html>
