@@ -1,4 +1,172 @@
 <!DOCTYPE html>
+<html lang="en-GB" dir="ltr">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="initial-scale=1, minimum-scale=1, width=device-width, interactive-widget=resizes-content, viewport-fit=cover">
+    <meta name="color-scheme" content="only">
+    <title>Gemini - Updated Interface</title>
+    
+    <!-- Preconnect & DNS Prefetch from reference design -->
+    <link rel="preconnect" href="https://www.gstatic.com/">
+    <link rel="preconnect" href="https://gemini.gstatic.com/">
+    <link rel="dns-prefetch" href="https://www.google.com/">
+    <link rel="dns-prefetch" href="https://lh3.googleusercontent.com/">
+    <link rel="dns-prefetch" href="https://www.gstatic.com/">
+    
+    <!-- Design & Display Styles Matching Reference HTML -->
+    <style>
+        :root {
+            --gem-sys-color--surface: #ffffff;
+            --gem-sys-color--on-surface: #1f1f1f;
+            --gem-sys-color--primary: #1a73e8;
+            --gem-sys-color--surface-container: #f0f4f9;
+            --gem-sys-color--surface-container-high: #e9eef6;
+            --gem-sys-color--surface-container-low: #f8f9fa;
+            --gem-sys-color--outline-variant: #c4c7c5;
+            --bard-color-form-field-placeholder: #444746;
+            --gem-sys-shape--corner-full: 9999px;
+            --gem-sys-shape--corner-extra-large: 28px;
+            --gem-sys-shape--corner-large: 16px;
+            --gem-sys-spacing--m: 16px;
+            --gem-sys-spacing--l: 24px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Google Sans', 'Helvetica Neue', sans-serif, -apple-system, BlinkMacSystemFont;
+            background-color: var(--gem-sys-color--surface);
+            color: var(--gem-sys-color--on-surface);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--gem-sys-color--outline-variant);
+            background-color: var(--gem-sys-color--surface);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin: 0;
+            color: var(--gem-sys-color--on-surface);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .welcome-container {
+            text-align: center;
+            max-width: 600px;
+            margin-bottom: 32px;
+        }
+
+        .welcome-container h2 {
+            font-size: 2.25rem;
+            font-weight: 400;
+            margin-bottom: 8px;
+            color: var(--gem-sys-color--primary);
+        }
+
+        .welcome-container p {
+            font-size: 1rem;
+            color: var(--bard-color-form-field-placeholder);
+            line-height: 1.5;
+        }
+
+        /* Updated Input Area Design derived from reference */
+        .initial-input-area-container {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 12px;
+            box-sizing: border-box;
+            align-items: center;
+            background-color: var(--gem-sys-color--surface-container-low);
+            border: 1px solid var(--gem-sys-color--outline-variant);
+            border-radius: var(--gem-sys-shape--corner-extra-large);
+            padding: 12px 20px;
+            max-width: 760px;
+            width: 100%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .initial-input-area-container:focus-within {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            border-color: var(--gem-sys-color--primary);
+            background-color: var(--gem-sys-color--surface);
+        }
+
+        .initial-input-area-container textarea {
+            line-height: 24px;
+            background-color: transparent;
+            border: none;
+            color: var(--gem-sys-color--on-surface);
+            font-size: 1rem;
+            outline: none;
+            resize: none;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .action-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--bard-color-form-field-placeholder);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border-radius: var(--gem-sys-shape--corner-full);
+            transition: background-color 0.2s;
+        }
+
+        .action-icon:hover {
+            background-color: var(--gem-sys-color--surface-container-high);
+            color: var(--gem-sys-color--on-surface);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Gemini Workspace</h1>
+    </header>
+
+    <main>
+        <div class="welcome-container">
+            <h2>Hello, ready to create?</h2>
+            <p>Your design settings, display color tokens, and layout guidelines have been successfully synchronized with the updated reference schema.</p>
+        </div>
+
+        <!-- Input Component Layout matching reference specification -->
+        <div class="initial-input-area-container">
+            <button class="action-icon" title="Upload file or image">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            </button>
+            <textarea placeholder="Enter a prompt here..." rows="1"></textarea>
+            <button class="action-icon" title="Send message">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </div>
+    </main>
+
+</body>
+</html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
