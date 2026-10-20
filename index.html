@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Naidu Family Tree Portal</title>
@@ -15,16 +14,6 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- 2. External Custom JS File (Optional) -->
-    <script src="script.js" defer></script>
-</head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Naidu Family Tree Portal</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -52,51 +41,6 @@
             }
         }
     </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap');
-
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        h1, h2, h3, .font-serif-title {
-            font-family: 'Playfair Display', Georgia, serif;
-        }
-
-        /* SVG Line Canvas Overlay styling */
-        .tree-connector-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn {
-            animation: fadeIn 0.3s ease-out forwards;
-        }
-    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-gold-500 selection:text-white">
 
@@ -119,7 +63,7 @@
                 <div class="relative">
                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
                     <input type="text" id="global-search" 
-                        placeholder="Search members (e.g. Jayshree, Neeta)..." 
+                        placeholder="Search members (e.g. Jayshree, Miloni)..." 
                         class="w-full pl-9 pr-8 py-1.5 bg-slate-800/80 text-xs sm:text-sm text-slate-100 placeholder-slate-400 rounded-full border border-slate-700 focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500 transition-all"
                         oninput="handleSearch(this.value)"
                         onfocus="handleSearch(this.value)">
@@ -153,7 +97,7 @@
     <div id="admin-banner" class="hidden bg-amber-500 text-brand-900 px-4 py-2 text-xs font-bold flex items-center justify-between border-b border-amber-600 shadow-inner">
         <div class="flex items-center space-x-2">
             <i data-lucide="shield-check" class="w-4 h-4"></i>
-            <span>Admin Mode Enabled — You can now edit names, photos, add new children, or delete members.</span>
+            <span>Admin Mode Enabled — You can now edit names, photos, add new children & grandchildren, or delete members.</span>
         </div>
         <button onclick="logoutAdmin()" class="underline hover:text-white text-[11px]">Logout Admin</button>
     </div>
@@ -210,7 +154,7 @@
             
             <form onsubmit="saveMemberChanges(event)" class="space-y-4">
                 <input type="hidden" id="edit-branch-id">
-                <input type="hidden" id="edit-member-type"> <!-- 'head', 'spouse', 'child', 'grandchild' -->
+                <input type="hidden" id="edit-member-type"> <!-- 'head', 'child', 'grandchild', 'new_child', 'new_grandchild' -->
                 <input type="hidden" id="edit-child-index">
                 <input type="hidden" id="edit-gc-index">
 
@@ -238,7 +182,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Role / Relation</label>
-                        <input type="text" id="edit-role" placeholder="e.g. Son, Daughter, Head" class="w-full p-2 bg-slate-50 border rounded-lg text-sm">
+                        <input type="text" id="edit-role" placeholder="e.g. Son, Daughter, Grandchild" class="w-full p-2 bg-slate-50 border rounded-lg text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Status</label>
@@ -249,16 +193,16 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Age (If applicable)</label>
-                        <input type="number" id="edit-age" placeholder="e.g. 52" class="w-full p-2 bg-slate-50 border rounded-lg text-sm">
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Age</label>
+                        <input type="number" id="edit-age" placeholder="e.g. 25" class="w-full p-2 bg-slate-50 border rounded-lg text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Birth Badge</label>
-                        <input type="text" id="edit-badge" placeholder="e.g. Eldest Daughter, Youngest Son" class="w-full p-2 bg-slate-50 border rounded-lg text-sm">
+                        <input type="text" id="edit-badge" placeholder="e.g. Eldest Daughter" class="w-full p-2 bg-slate-50 border rounded-lg text-sm">
                     </div>
                 </div>
 
-                <!-- Spouse Fields (Conditional/Optional) -->
+                <!-- Spouse Fields -->
                 <div id="spouse-fields-group" class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
                     <span class="text-xs font-bold text-brand-900 block border-b pb-1">Spouse Information</span>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -275,7 +219,7 @@
 
                 <div class="pt-2 flex items-center justify-end space-x-2">
                     <button type="button" onclick="closeModal('modal-edit-member')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-300">Cancel</button>
-                    <button type="submit" class="px-5 py-2 bg-brand-800 text-white text-xs font-bold rounded-lg hover:bg-brand-900 shadow">Save Member Details</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-800 text-white text-xs font-bold rounded-lg hover:bg-brand-900 shadow">Save Details</button>
                 </div>
             </form>
         </div>
@@ -348,8 +292,8 @@
                     spousePhoto: "",
                     status: "Head Deceased / Spouse Alive",
                     children: [
-                        { name: "Arun Kumar Naidu", role: "Son", photo: "" },
-                        { name: "Vijay Kumar Naidu", role: "Son", photo: "" }
+                        { name: "Arun Kumar Naidu", role: "Son", photo: "", grandchildren: [] },
+                        { name: "Vijay Kumar Naidu", role: "Son", photo: "", grandchildren: [] }
                     ]
                 },
                 {
@@ -361,7 +305,7 @@
                     spousePhoto: "",
                     status: "Deceased",
                     children: [
-                        { name: "Umashankar Naidu", role: "Son", photo: "" }
+                        { name: "Umashankar Naidu", role: "Son", photo: "", grandchildren: [] }
                     ]
                 },
                 {
@@ -373,8 +317,8 @@
                     spousePhoto: "",
                     status: "Deceased",
                     children: [
-                        { name: "Shrinivas Rao", role: "Son", photo: "" },
-                        { name: "Shiv Narayan Rao", role: "Son", photo: "" }
+                        { name: "Shrinivas Rao", role: "Son", photo: "", grandchildren: [] },
+                        { name: "Shiv Narayan Rao", role: "Son", photo: "", grandchildren: [] }
                     ]
                 },
                 {
@@ -386,8 +330,8 @@
                     spousePhoto: "",
                     status: "Deceased",
                     children: [
-                        { name: "Anjana Rao", role: "Daughter", photo: "" },
-                        { name: "Kanchana Rao", role: "Daughter", photo: "" }
+                        { name: "Anjana Rao", role: "Daughter", photo: "", grandchildren: [] },
+                        { name: "Kanchana Rao", role: "Daughter", photo: "", grandchildren: [] }
                     ]
                 },
                 {
@@ -399,9 +343,9 @@
                     spousePhoto: "",
                     status: "Head Deceased",
                     children: [
-                        { name: "Jayshree Naidu", role: "Daughter", birthBadge: "Eldest Daughter", photo: "" },
-                        { name: "Manju Naidu", role: "Daughter", birthBadge: "Daughter", photo: "" },
-                        { name: "Dinesh Naidu", role: "Son", birthBadge: "Youngest Son", photo: "" }
+                        { name: "Jayshree Naidu", role: "Daughter", birthBadge: "Eldest Daughter", photo: "", grandchildren: [] },
+                        { name: "Manju Naidu", role: "Daughter", birthBadge: "Daughter", photo: "", grandchildren: [] },
+                        { name: "Dinesh Naidu", role: "Son", birthBadge: "Youngest Son", photo: "", grandchildren: [] }
                     ]
                 },
                 {
@@ -413,9 +357,9 @@
                     spousePhoto: "",
                     status: "Deceased",
                     children: [
-                        { name: "Santosh Naidu", role: "Son", age: 54, photo: "" },
-                        { name: "Sushil Naidu", role: "Son", age: 52, photo: "" },
-                        { name: "Ragini Naidu", role: "Daughter", age: 51, photo: "" }
+                        { name: "Santosh Naidu", role: "Son", age: 54, photo: "", grandchildren: [] },
+                        { name: "Sushil Naidu", role: "Son", age: 52, photo: "", grandchildren: [] },
+                        { name: "Ragini Naidu", role: "Daughter", age: 51, photo: "", grandchildren: [] }
                     ]
                 },
                 {
@@ -427,9 +371,9 @@
                     spousePhoto: "",
                     status: "Alive",
                     children: [
-                        { name: "Veena Naidu", role: "Daughter", photo: "" },
-                        { name: "Deepa Naidu", role: "Daughter", photo: "" },
-                        { name: "Madhuri Naidu", role: "Daughter", photo: "" }
+                        { name: "Veena Naidu", role: "Daughter", photo: "", grandchildren: [] },
+                        { name: "Deepa Naidu", role: "Daughter", photo: "", grandchildren: [] },
+                        { name: "Madhuri Naidu", role: "Daughter", photo: "", grandchildren: [] }
                     ]
                 },
                 {
@@ -441,8 +385,8 @@
                     spousePhoto: "",
                     status: "Deceased",
                     children: [
-                        { name: "Rajesh Naidu", role: "Son", photo: "" },
-                        { name: "Sunita Naidu", role: "Daughter", photo: "" }
+                        { name: "Rajesh Naidu", role: "Son", photo: "", grandchildren: [] },
+                        { name: "Sunita Naidu", role: "Daughter", photo: "", grandchildren: [] }
                     ]
                 },
                 {
@@ -454,7 +398,7 @@
                     spousePhoto: "",
                     status: "Alive",
                     children: [
-                        { name: "Kirti Naidu", role: "Daughter", photo: "" }
+                        { name: "Kirti Naidu", role: "Daughter", photo: "", grandchildren: [] }
                     ]
                 },
                 {
@@ -466,8 +410,8 @@
                     spousePhoto: "",
                     status: "Alive",
                     children: [
-                        { name: "Jayant Naidu", role: "Son", photo: "" },
-                        { name: "Madhvi Naidu", role: "Daughter", photo: "" }
+                        { name: "Jayant Naidu", role: "Son", photo: "", grandchildren: [] },
+                        { name: "Madhvi Naidu", role: "Daughter", photo: "", grandchildren: [] }
                     ]
                 },
                 {
@@ -479,9 +423,9 @@
                     spousePhoto: "",
                     status: "Alive",
                     children: [
-                        { name: "Manoj Naidu", role: "Son", photo: "" },
-                        { name: "Sangeeta Naidu", role: "Daughter", photo: "" },
-                        { name: "Ravi Naidu", role: "Son", photo: "" }
+                        { name: "Manoj Naidu", role: "Son", photo: "", grandchildren: [] },
+                        { name: "Sangeeta Naidu", role: "Daughter", photo: "", grandchildren: [] },
+                        { name: "Ravi Naidu", role: "Son", photo: "", grandchildren: [] }
                     ]
                 },
                 {
@@ -498,21 +442,29 @@
                             role: "Daughter",
                             spouse: "V. Mukesh Rao",
                             photo: "",
-                            grandchildren: [{ name: "V. Miloni" }, { name: "V. Nirav" }]
+                            grandchildren: [
+                                { name: "V. Miloni", spouse: "", age: null, photo: "" },
+                                { name: "V. Nirav", spouse: "", age: null, photo: "" }
+                            ]
                         },
                         { 
                             name: "Leena Naidu", 
                             role: "Daughter",
                             spouse: "Addanky Anil",
                             photo: "",
-                            grandchildren: [{ name: "Addanky Bhavya" }, { name: "Addanky Kinjal" }]
+                            grandchildren: [
+                                { name: "Addanky Bhavya", spouse: "", age: null, photo: "" },
+                                { name: "Addanky Kinjal", spouse: "", age: null, photo: "" }
+                            ]
                         },
                         { 
                             name: "Neelkanth Naidu", 
                             role: "Son",
                             spouse: "J. Harika",
                             photo: "",
-                            grandchildren: [{ name: "Vartika Naidu" }]
+                            grandchildren: [
+                                { name: "Vartika Naidu", spouse: "", age: null, photo: "" }
+                            ]
                         }
                     ]
                 },
@@ -525,9 +477,9 @@
                     spousePhoto: "",
                     status: "Deceased",
                     children: [
-                        { name: "Abhishek Naidu", role: "Son", photo: "" },
-                        { name: "Samyukta Naidu", role: "Daughter", photo: "" },
-                        { name: "Divya Naidu", role: "Daughter", photo: "" }
+                        { name: "Abhishek Naidu", role: "Son", photo: "", grandchildren: [] },
+                        { name: "Samyukta Naidu", role: "Daughter", photo: "", grandchildren: [] },
+                        { name: "Divya Naidu", role: "Daughter", photo: "", grandchildren: [] }
                     ]
                 }
             ]
@@ -536,7 +488,7 @@
         // State Management
         let familyData = loadFamilyData();
         let isAdminLoggedIn = false;
-        let currentView = 'home'; // 'home' or 'b1'...'b13'
+        let currentView = 'home';
         let tempPhotoBase64 = "";
 
         // Persistent Local Storage Handler
@@ -563,7 +515,6 @@
             renderView();
             window.addEventListener('resize', drawConnectorLines);
             
-            // Close dropdown when clicking outside
             document.addEventListener('click', (e) => {
                 const searchInput = document.getElementById('global-search');
                 if (searchInput && searchInput.parentElement && !searchInput.parentElement.contains(e.target)) {
@@ -618,7 +569,6 @@
         function renderHomeMainTree() {
             return `
                 <div class="space-y-10 relative animate-fadeIn">
-                    <!-- Page Header Banner -->
                     <div class="text-center space-y-3 max-w-3xl mx-auto pt-2">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300">
                             <i data-lucide="crown" class="w-3.5 h-3.5 mr-1 text-gold-600"></i> Ancestral Lineage Chart
@@ -631,18 +581,14 @@
                         </p>
                     </div>
 
-                    <!-- SVG Lines Container Overlay -->
                     <div class="relative min-h-[850px] w-full overflow-x-auto pb-8">
-                        <svg id="svg-connectors" class="tree-connector-svg">
-                            <!-- Curved line connectors dynamically injected -->
-                        </svg>
+                        <svg id="svg-connectors" class="tree-connector-svg"></svg>
 
-                        <!-- ROOT NODE: Ancestral Parents -->
+                        <!-- ROOT NODE -->
                         <div class="flex justify-center mb-16 relative z-20">
                             <div id="root-node" class="bg-gradient-to-r from-brand-900 via-slate-900 to-brand-800 text-white rounded-3xl p-6 shadow-2xl border-4 border-gold-400 text-center max-w-xl w-full relative group">
-                                
                                 ${isAdminLoggedIn ? `
-                                    <button onclick="openEditModal('root', 'head')" class="absolute top-3 right-3 p-2 bg-amber-500 text-brand-900 rounded-full hover:bg-gold-400 shadow transition-transform hover:scale-110" title="Edit Root Ancestors">
+                                    <button onclick="openEditModal('root', 'head')" class="absolute top-3 right-3 p-2 bg-amber-500 text-brand-900 rounded-full hover:bg-gold-400 shadow transition-transform hover:scale-110" title="Edit Root">
                                         <i data-lucide="edit-2" class="w-4 h-4"></i>
                                     </button>
                                 ` : ''}
@@ -686,28 +632,19 @@
             `;
         }
 
-        // Branch Node Card on Main Page
         function renderBranchCardNode(b) {
             const isAlive = b.status.includes('Alive');
             return `
-                <div id="node-${b.id}" 
-                    class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-xl border border-slate-200 hover:border-gold-500 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
-                    
-                    <!-- Top Ribbon Indicator -->
+                <div id="node-${b.id}" class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-xl border border-slate-200 hover:border-gold-500 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
                     <div class="absolute top-0 left-0 right-0 h-1.5 ${isAlive ? 'bg-emerald-500' : 'bg-brand-800'}"></div>
-
                     <div>
-                        <!-- Branch Number & Status Header -->
                         <div class="flex items-center justify-between mb-3 text-xs">
                             <span class="font-bold text-brand-800 bg-brand-50 px-2.5 py-1 rounded-md border border-brand-100 flex items-center space-x-1">
                                 <i data-lucide="git-branch" class="w-3.5 h-3.5 text-gold-600"></i>
                                 <span>Branch #${b.branchNum}</span>
                             </span>
                             <div class="flex items-center space-x-2">
-                                <span class="text-slate-500 text-[11px] font-medium flex items-center space-x-1">
-                                    <i data-lucide="${isAlive ? 'user-check' : 'user-x'}" class="w-3 h-3 ${isAlive ? 'text-emerald-500' : 'text-slate-400'}"></i>
-                                    <span>${b.status}</span>
-                                </span>
+                                <span class="text-slate-500 text-[11px] font-medium">${b.status}</span>
                                 ${isAdminLoggedIn ? `
                                     <button onclick="openEditModal('${b.id}', 'head')" class="p-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-md transition-colors" title="Edit Head">
                                         <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
@@ -716,49 +653,35 @@
                             </div>
                         </div>
 
-                        <!-- Head & Spouse Photo Header -->
                         <div class="flex items-center space-x-3 mb-3 cursor-pointer" onclick="navigateTo('${b.id}')">
                             ${renderAvatar(b.photo, b.head, "w-12 h-12")}
                             <div class="min-w-0 flex-1">
-                                <h4 class="font-bold text-slate-900 text-base group-hover:text-brand-800 transition-colors leading-snug truncate">
-                                    ${b.head}
-                                </h4>
+                                <h4 class="font-bold text-slate-900 text-base group-hover:text-brand-800 transition-colors leading-snug truncate">${b.head}</h4>
                                 <div class="text-xs text-slate-600 flex items-center space-x-1 mt-0.5">
                                     <i data-lucide="heart" class="w-3 h-3 text-rose-500 flex-shrink-0"></i>
                                     <span class="truncate">${b.spouse || 'N/A'}</span>
-                                    ${b.spouseAge ? `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-1.5 rounded-full">Age: ${b.spouseAge}</span>` : ''}
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Children Badges -->
                         <div class="mt-4 pt-3 border-t border-slate-100">
                             <div class="flex items-center justify-between mb-2">
-                                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
-                                    <i data-lucide="users" class="w-3 h-3"></i>
-                                    <span>Children (${b.children.length})</span>
-                                </p>
+                                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Children (${b.children.length})</p>
                                 ${isAdminLoggedIn ? `
-                                    <button onclick="openAddChildModal('${b.id}')" class="text-[11px] text-brand-800 font-bold hover:underline flex items-center space-x-0.5">
-                                        <i data-lucide="plus-circle" class="w-3 h-3"></i>
-                                        <span>Add</span>
-                                    </button>
+                                    <button onclick="openAddChildModal('${b.id}')" class="text-[11px] text-brand-800 font-bold hover:underline">+ Add</button>
                                 ` : ''}
                             </div>
-
                             <div class="flex flex-wrap gap-1.5">
-                                ${b.children.map((child, idx) => `
+                                ${b.children.map(child => `
                                     <div class="inline-flex items-center text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded-md border border-slate-200 space-x-1">
                                         ${renderAvatar(child.photo, child.name, "w-4 h-4")}
                                         <span class="font-medium">${child.name}</span>
-                                        ${child.birthBadge ? `<span class="text-[9px] font-bold px-1 rounded ${child.birthBadge.includes('Eldest') ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}">${child.birthBadge}</span>` : ''}
                                     </div>
                                 `).join('')}
                             </div>
                         </div>
                     </div>
 
-                    <!-- Footer Action Callout -->
                     <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-brand-800 group-hover:text-gold-600 transition-colors cursor-pointer" onclick="navigateTo('${b.id}')">
                         <span>Open Detailed Branch Page</span>
                         <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
@@ -767,14 +690,12 @@
             `;
         }
 
-        // Draw SVG Connecting Lines
         function drawConnectorLines() {
             const svg = document.getElementById('svg-connectors');
             const rootNode = document.getElementById('root-node');
             if (!svg || !rootNode) return;
 
             svg.innerHTML = '';
-
             const rootRect = rootNode.getBoundingClientRect();
             const svgRect = svg.getBoundingClientRect();
 
@@ -806,12 +727,8 @@
         // DETAILED BRANCH FAMILY PAGE VIEW
         // -------------------------------------------------------------
         function renderBranchPage(b) {
-            const isAlive = b.status.includes('Alive');
-            const totalGrandchildren = b.children.reduce((acc, c) => acc + (c.grandchildren ? c.grandchildren.length : 0), 0);
-
             return `
                 <div class="space-y-8 animate-fadeIn">
-                    <!-- Breadcrumb Navigation -->
                     <nav class="flex items-center space-x-2 text-xs sm:text-sm text-slate-500">
                         <button onclick="navigateTo('home')" class="hover:text-brand-800 flex items-center space-x-1">
                             <i data-lucide="home" class="w-4 h-4"></i>
@@ -823,7 +740,6 @@
                         <span class="font-semibold text-brand-900">${b.head}</span>
                     </nav>
 
-                    <!-- Branch Header Hero Banner -->
                     <div class="bg-gradient-to-r from-brand-900 via-slate-900 to-brand-800 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-gold-500/20 relative overflow-hidden">
                         <div class="relative z-10 space-y-4">
                             <div class="flex flex-wrap items-center justify-between gap-3">
@@ -831,15 +747,9 @@
                                     Primary Branch #${b.branchNum}
                                 </span>
                                 <div class="flex items-center space-x-2">
-                                    <span class="text-slate-300 text-xs sm:text-sm flex items-center space-x-1">
-                                        <i data-lucide="info" class="w-4 h-4 text-gold-400"></i>
-                                        <span>Status: ${b.status}</span>
-                                    </span>
+                                    <span class="text-slate-300 text-xs sm:text-sm">Status: ${b.status}</span>
                                     ${isAdminLoggedIn ? `
-                                        <button onclick="openEditModal('${b.id}', 'head')" class="px-3 py-1 bg-amber-500 text-brand-900 font-bold text-xs rounded-lg hover:bg-gold-400 shadow flex items-center space-x-1">
-                                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                                            <span>Edit Head</span>
-                                        </button>
+                                        <button onclick="openEditModal('${b.id}', 'head')" class="px-3 py-1 bg-amber-500 text-brand-900 font-bold text-xs rounded-lg hover:bg-gold-400 shadow">Edit Head</button>
                                     ` : ''}
                                 </div>
                             </div>
@@ -847,9 +757,7 @@
                             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2">
                                 ${renderAvatar(b.photo, b.head, "w-20 h-20")}
                                 <div>
-                                    <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-100 font-serif-title leading-tight">
-                                        ${b.head}
-                                    </h2>
+                                    <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-100 font-serif-title leading-tight">${b.head}</h2>
                                     <div class="mt-2 flex flex-wrap items-center gap-4 text-xs sm:text-sm text-amber-200/90">
                                         <div class="flex items-center space-x-1.5">
                                             <i data-lucide="heart" class="w-4 h-4 text-rose-400"></i>
@@ -862,12 +770,12 @@
                         </div>
                     </div>
 
-                    <!-- Children & Next Generation Hierarchy Section -->
+                    <!-- Children & Grandchildren Section -->
                     <div class="space-y-4">
                         <div class="flex items-center justify-between">
                             <h3 class="text-xl font-bold text-slate-900 font-serif-title flex items-center space-x-2">
                                 <i data-lucide="users" class="w-5 h-5 text-brand-800"></i>
-                                <span>Children & Next Generation (${b.children.length})</span>
+                                <span>Children & Grandchildren (${b.children.length})</span>
                             </h3>
 
                             ${isAdminLoggedIn ? `
@@ -878,18 +786,14 @@
                             ` : ''}
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             ${b.children.map((child, cIdx) => `
-                                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3 relative group">
+                                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 relative group">
                                     
                                     ${isAdminLoggedIn ? `
                                         <div class="absolute top-3 right-3 flex items-center space-x-1 bg-white/90 p-1 rounded-lg border shadow-sm">
-                                            <button onclick="openEditModal('${b.id}', 'child', ${cIdx})" class="p-1 text-slate-600 hover:text-brand-800" title="Edit Child">
-                                                <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
-                                            </button>
-                                            <button onclick="deleteMember('${b.id}', 'child', ${cIdx})" class="p-1 text-rose-600 hover:text-rose-800" title="Delete Child">
-                                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                            </button>
+                                            <button onclick="openEditModal('${b.id}', 'child', ${cIdx})" class="p-1 text-slate-600 hover:text-brand-800" title="Edit Child"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
+                                            <button onclick="deleteMember('${b.id}', 'child', ${cIdx})" class="p-1 text-rose-600 hover:text-rose-800" title="Delete Child"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                                         </div>
                                     ` : ''}
 
@@ -897,51 +801,53 @@
                                         ${renderAvatar(child.photo, child.name, "w-14 h-14")}
                                         <div class="flex-1 min-w-0">
                                             <div class="flex items-center space-x-1.5 flex-wrap">
-                                                <h4 class="font-bold text-slate-900 text-base leading-snug">${child.name}</h4>
-                                                ${child.birthBadge ? `
-                                                    <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${child.birthBadge.includes('Eldest') ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-blue-100 text-blue-800 border border-blue-300'}">
-                                                        ${child.birthBadge}
-                                                    </span>
-                                                ` : ''}
+                                                <h4 class="font-bold text-slate-900 text-base leading-snug">${child.name}</h4>${child.birthBadge ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">${child.birthBadge}</span>` : ''}
                                             </div>
-                                            <p class="text-xs text-slate-500 mt-0.5">Relation: ${child.role || 'Member'}</p>
-                                            ${child.spouse ? `
+                                            <p class="text-xs text-slate-500 mt-0.5">Relation: ${child.role \vert{}\vert{} 'Member'}</p>${child.spouse ? `
                                                 <div class="mt-1 text-xs text-slate-600 flex items-center space-x-1">
                                                     <i data-lucide="heart" class="w-3 h-3 text-rose-500"></i>
                                                     <span>m. <strong>${child.spouse}</strong></span>
                                                 </div>
                                             ` : ''}
-                                            ${child.age ? `
-                                                <div class="mt-2 inline-flex items-center space-x-1 bg-amber-50 text-amber-800 text-xs font-semibold px-2 py-0.5 rounded-full border border-amber-200">
-                                                    <i data-lucide="calendar" class="w-3 h-3 text-gold-600"></i>
-                                                    <span>Age: ${child.age} yrs</span>
-                                                </div>
-                                            ` : ''}
+                                            ${child.age ? `<div class="mt-2 inline-flex items-center space-x-1 bg-amber-50 text-amber-800 text-xs font-semibold px-2 py-0.5 rounded-full border border-amber-200"><span>Age: ${child.age} yrs</span></div>` : ''}
                                         </div>
                                     </div>
 
-                                    <!-- Grandchildren Subsection -->
-                                    <div class="pt-3 border-t border-slate-100">
-                                        <div class="flex items-center justify-between mb-1.5">
-                                            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
-                                                <i data-lucide="baby" class="w-3.5 h-3.5 text-gold-600"></i>
+                                    <!-- Grandchildren Subsection with Photos -->
+                                    <div class="pt-3 border-t border-slate-100 space-y-3">
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center space-x-1">
+                                                <i data-lucide="baby" class="w-4 h-4 text-gold-600"></i>
                                                 <span>Grandchildren (${child.grandchildren ? child.grandchildren.length : 0})</span>
                                             </p>
                                             ${isAdminLoggedIn ? `
-                                                <button onclick="addGrandchildPrompt('${b.id}', ${cIdx})" class="text-[10px] text-brand-800 font-bold hover:underline">
-                                                    + Add
+                                                <button onclick="openAddGrandchildModal('${b.id}', ${cIdx})" class="text-xs text-brand-800 font-bold hover:underline flex items-center space-x-1">
+                                                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                                                    <span>Add Grandchild</span>
                                                 </button>
                                             ` : ''}
                                         </div>
-                                        <div class="flex flex-wrap gap-1">
+
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                             ${child.grandchildren && child.grandchildren.length > 0 ? child.grandchildren.map((gc, gcIdx) => `
-                                                <span class="inline-flex items-center text-xs bg-amber-50/80 text-amber-900 px-2 py-0.5 rounded border border-amber-200/60 font-medium space-x-1">
-                                                    <span>${gc.name}</span>
+                                                <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 flex items-center justify-between relative group/gc">
+                                                    <div class="flex items-center space-x-2.5 min-w-0">
+                                                        ${renderAvatar(gc.photo, gc.name, "w-10 h-10")}
+                                                        <div class="min-w-0">
+                                                            <p class="font-bold text-slate-900 text-xs truncate">${gc.name}</p>
+                                                            ${gc.spouse ? `<p class="text-[11px] text-slate-500 truncate">m. ${gc.spouse}</p>` : ''}
+                                                            ${gc.age ? `<span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded">Age: ${gc.age}</span>` : ''}
+                                                        </div>
+                                                    </div>
+
                                                     ${isAdminLoggedIn ? `
-                                                        <button onclick="deleteGrandchild('${b.id}', ${cIdx}, ${gcIdx})" class="text-rose-500 hover:text-rose-700 ml-1">×</button>
+                                                        <div class="flex items-center space-x-1 opacity-80 group-hover/gc:opacity-100">
+                                                            <button onclick="openEditModal('${b.id}', 'grandchild', ${cIdx},${gcIdx})" class="p-1 text-slate-600 hover:text-brand-800" title="Edit Grandchild"><i data-lucide="edit-3" class="w-3 h-3"></i></button>
+                                                            <button onclick="deleteGrandchild('${b.id}', ${cIdx},${gcIdx})" class="p-1 text-rose-600 hover:text-rose-800" title="Delete Grandchild"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                                                        </div>
                                                     ` : ''}
-                                                </span>
-                                            `).join('') : '<span class="text-xs text-slate-400 italic">No recorded grandchildren</span>'}
+                                                </div>
+                                            `).join('') : '<p class="text-xs text-slate-400 italic">No recorded grandchildren yet.</p>'}
                                         </div>
                                     </div>
                                 </div>
@@ -1004,10 +910,11 @@
         // -------------------------------------------------------------
         // EDIT & ADD MEMBER MODAL LOGIC
         // -------------------------------------------------------------
-        function openEditModal(branchId, type, childIdx = null) {
+        function openEditModal(branchId, type, childIdx = null, gcIdx = null) {
             document.getElementById('edit-branch-id').value = branchId;
             document.getElementById('edit-member-type').value = type;
             document.getElementById('edit-child-index').value = childIdx !== null ? childIdx : '';
+            document.getElementById('edit-gc-index').value = gcIdx !== null ? gcIdx : '';
             tempPhotoBase64 = "";
 
             let memberObj = null;
@@ -1020,6 +927,8 @@
                     memberObj = branch;
                 } else if (type === 'child') {
                     memberObj = branch.children[childIdx];
+                } else if (type === 'grandchild') {
+                    memberObj = branch.children[childIdx].grandchildren[gcIdx];
                 }
             }
 
@@ -1027,7 +936,7 @@
 
             document.getElementById('edit-modal-title').textContent = `Edit Details: ${memberObj.head || memberObj.name}`;
             document.getElementById('edit-name').value = memberObj.head || memberObj.name || '';
-            document.getElementById('edit-role').value = memberObj.role || (type === 'head' ? 'Branch Head' : '');
+            document.getElementById('edit-role').value = memberObj.role || (type === 'head' ? 'Branch Head' : type === 'grandchild' ? 'Grandchild' : '');
             document.getElementById('edit-status').value = memberObj.status || 'Alive';
             document.getElementById('edit-age').value = memberObj.age || '';
             document.getElementById('edit-badge').value = memberObj.birthBadge || '';
@@ -1043,11 +952,33 @@
             document.getElementById('edit-branch-id').value = branchId;
             document.getElementById('edit-member-type').value = 'new_child';
             document.getElementById('edit-child-index').value = '';
+            document.getElementById('edit-gc-index').value = '';
             tempPhotoBase64 = "";
 
-            document.getElementById('edit-modal-title').textContent = "Add New Family Member";
+            document.getElementById('edit-modal-title').textContent = "Add New Child";
             document.getElementById('edit-name').value = '';
             document.getElementById('edit-role').value = 'Son';
+            document.getElementById('edit-status').value = 'Alive';
+            document.getElementById('edit-age').value = '';
+            document.getElementById('edit-badge').value = '';
+            document.getElementById('edit-spouse').value = '';
+            document.getElementById('edit-spouse-age').value = '';
+            document.getElementById('edit-photo-url').value = '';
+
+            previewPhotoUrl('');
+            openModal('modal-edit-member');
+        }
+
+        function openAddGrandchildModal(branchId, childIdx) {
+            document.getElementById('edit-branch-id').value = branchId;
+            document.getElementById('edit-member-type').value = 'new_grandchild';
+            document.getElementById('edit-child-index').value = childIdx;
+            document.getElementById('edit-gc-index').value = '';
+            tempPhotoBase64 = "";
+
+            document.getElementById('edit-modal-title').textContent = "Add New Grandchild";
+            document.getElementById('edit-name').value = '';
+            document.getElementById('edit-role').value = 'Grandchild';
             document.getElementById('edit-status').value = 'Alive';
             document.getElementById('edit-age').value = '';
             document.getElementById('edit-badge').value = '';
@@ -1089,6 +1020,7 @@
             const branchId = document.getElementById('edit-branch-id').value;
             const type = document.getElementById('edit-member-type').value;
             const childIdx = document.getElementById('edit-child-index').value;
+            const gcIdx = document.getElementById('edit-gc-index').value;
 
             const name = document.getElementById('edit-name').value;
             const role = document.getElementById('edit-role').value;
@@ -1118,6 +1050,12 @@
                     if (badge) child.birthBadge = badge;
                     child.spouse = spouse;
                     child.photo = photoUrl;
+                } else if (type === 'grandchild') {
+                    const gc = branch.children[childIdx].grandchildren[gcIdx];
+                    gc.name = name;
+                    if (age) gc.age = parseInt(age);
+                    gc.spouse = spouse;
+                    gc.photo = photoUrl;
                 } else if (type === 'new_child') {
                     branch.children.push({
                         name: name,
@@ -1127,6 +1065,16 @@
                         spouse: spouse || undefined,
                         photo: photoUrl,
                         grandchildren: []
+                    });
+                } else if (type === 'new_grandchild') {
+                    if (!branch.children[childIdx].grandchildren) {
+                        branch.children[childIdx].grandchildren = [];
+                    }
+                    branch.children[childIdx].grandchildren.push({
+                        name: name,
+                        spouse: spouse || undefined,
+                        age: age ? parseInt(age) : undefined,
+                        photo: photoUrl
                     });
                 }
             }
@@ -1146,20 +1094,8 @@
             }
         }
 
-        function addGrandchildPrompt(branchId, childIdx) {
-            const name = prompt("Enter Grandchild Name:");
-            if (name && name.trim() !== '') {
-                const branch = familyData.branches.find(b => b.id === branchId);
-                if (!branch.children[childIdx].grandchildren) {
-                    branch.children[childIdx].grandchildren = [];
-                }
-                branch.children[childIdx].grandchildren.push({ name: name.trim() });
-                saveFamilyData();
-                renderView();
-            }
-        }
-
         function deleteGrandchild(branchId, childIdx, gcIdx) {
+            if (!confirm("Are you sure you want to remove this grandchild?")) return;
             const branch = familyData.branches.find(b => b.id === branchId);
             branch.children[childIdx].grandchildren.splice(gcIdx, 1);
             saveFamilyData();
@@ -1175,25 +1111,32 @@
 
         function exportToCSV() {
             let csvRows = [];
-            csvRows.push(["BranchNum", "BranchHead", "HeadStatus", "SpouseName", "ChildName", "ChildRole", "ChildAge", "ChildSpouse", "Grandchildren"].join(","));
+            csvRows.push(["BranchNum", "BranchHead", "HeadStatus", "SpouseName", "ChildName", "ChildRole", "ChildAge", "ChildSpouse", "GrandchildName", "GrandchildSpouse", "GrandchildAge"].join(","));
 
             familyData.branches.forEach(b => {
                 if (b.children.length === 0) {
-                    csvRows.push([b.branchNum, `"${b.head}"`, `"${b.status}"`, `"${b.spouse || ''}"`, "", "", "", "", ""].join(","));
+                    csvRows.push([b.branchNum, `"${b.head}"`, `"${b.status}"`, `"${b.spouse || ''}"`, "", "", "", "", "", "", ""].join(","));
                 } else {
                     b.children.forEach(c => {
-                        const gcs = c.grandchildren ? c.grandchildren.map(g => g.name).join("; ") : "";
-                        csvRows.push([
-                            b.branchNum,
-                            `"${b.head}"`,
-                            `"${b.status}"`,
-                            `"${b.spouse || ''}"`,
-                            `"${c.name}"`,
-                            `"${c.role || ''}"`,
-                            c.age || "",
-                            `"${c.spouse || ''}"`,
-                            `"${gcs}"`
-                        ].join(","));
+                        if (!c.grandchildren || c.grandchildren.length === 0) {
+                            csvRows.push([b.branchNum, `"${b.head}"`, `"${b.status}"`, `"${b.spouse || ''}"`, `"${c.name}"`, `"${c.role || ''}"`, c.age || "", `"${c.spouse || ''}"`, "", "", ""].join(","));
+                        } else {
+                            c.grandchildren.forEach(gc => {
+                                csvRows.push([
+                                    b.branchNum,
+                                    `"${b.head}"`,
+                                    `"${b.status}"`,
+                                    `"${b.spouse || ''}"`,
+                                    `"${c.name}"`,
+                                    `"${c.role || ''}"`,
+                                    c.age || "",
+                                    `"${c.spouse || ''}"`,
+                                    `"${gc.name}"`,
+                                    `"${gc.spouse || ''}"`,
+                                    gc.age || ""
+                                ].join(","));
+                            });
+                        }
                     });
                 }
             });
@@ -1247,7 +1190,6 @@
             }
         }
 
-        // Modal Helpers
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
@@ -1266,7 +1208,6 @@
             const searchTerm = query.toLowerCase().trim();
             const matches = [];
 
-            // Search Branches
             familyData.branches.forEach(b => {
                 if (b.head.toLowerCase().includes(searchTerm)) {
                     matches.push({ name: b.head, type: `Branch #${b.branchNum} Head`, action: () => navigateTo(b.id) });
@@ -1274,6 +1215,13 @@
                 b.children.forEach(c => {
                     if (c.name.toLowerCase().includes(searchTerm)) {
                         matches.push({ name: c.name, type: `Child in Branch #${b.branchNum}`, action: () => navigateTo(b.id) });
+                    }
+                    if (c.grandchildren) {
+                        c.grandchildren.forEach(gc => {
+                            if (gc.name.toLowerCase().includes(searchTerm)) {
+                                matches.push({ name: gc.name, type: `Grandchild in Branch #${b.branchNum}`, action: () => navigateTo(b.id) });
+                            }
+                        });
                     }
                 });
             });
