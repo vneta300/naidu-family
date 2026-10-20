@@ -1,1 +1,279 @@
 
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="color-scheme" content="only">
+    <title>Naidu Family Tree Portal</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS v4 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: #1e293b;
+        }
+        .glass-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.2);
+        }
+        .branch-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .branch-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-amber-200 selection:text-amber-900">
+
+    <!-- Header & Search Portal -->
+    <header class="glass-header text-white sticky top-0 z-50 backdrop-blur-md border-b border-blue-800/50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="cursor-pointer flex items-center gap-3 group" onclick="showMainView()">
+                <div class="w-10 h-10 rounded-xl bg-amber-400 text-blue-950 flex items-center justify-center font-extrabold text-xl shadow-lg group-hover:scale-105 transition">🌳</div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-tight block">Naidu Family Portal</span>
+                    <span class="text-xs text-blue-200 font-medium">Generational Lineage Archive</span>
+                </div>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="w-full md:w-[420px] relative">
+                <div class="flex items-center bg-blue-900/80 border border-blue-700/60 rounded-2xl px-4 py-2.5 shadow-inner focus-within:ring-2 focus-within:ring-amber-400 focus-within:border-transparent transition">
+                    <svg class="w-4 h-4 text-blue-300 mr-3 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="searchInput" placeholder="Search members, spouses, children..." 
+                        class="bg-transparent text-white placeholder-blue-300 text-sm focus:outline-none w-full"
+                        oninput="handleSearch(this.value)">
+                </div>
+                <div id="searchResults" class="absolute left-0 right-0 mt-2 bg-white text-slate-800 rounded-2xl shadow-2xl overflow-hidden hidden z-50 max-h-80 overflow-y-auto border border-slate-100 divide-y divide-slate-100"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main id="appContainer" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-10 w-full">
+        <!-- Dynamically loaded content -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center text-sm border-t border-slate-800">
+        <p class="font-medium">&copy; 2026 Naidu Family Tree Portal. Live synced with Google Sheets.</p>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        // Array supporting single or multiple published Google Sheet CSV URLs
+        const GOOGLE_SHEET_CSV_URLS = [
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuCfhmRW8qR-EIoDKG3HXPGnZiGHsHkyOrgHBJUCKel0j_92TBPwsFIuf1_1dY-sY04fAfxc5g1QfD/pub?gid=0&single=true&output=csv"
+        ];
+
+        let familyData = [];
+
+        async function loadFamilyData() {
+            if(!GOOGLE_SHEET_CSV_URLS || GOOGLE_SHEET_CSV_URLS.length === 0) {
+                renderDefaultView();
+                return;
+            }
+            try {
+                let combinedData = [];
+                for(const url of GOOGLE_SHEET_CSV_URLS) {
+                    const response = await fetch(url);
+                    const csvText = await response.text();
+                    const parsed = parseCSV(csvText);
+                    combinedData = combinedData.concat(parsed);
+                }
+                
+                // Deduplicate or group by branch number if necessary
+                familyData = combinedData;
+                
+                if(familyData.length > 0) {
+                    renderMainTree();
+                } else {
+                    renderDefaultView();
+                }
+            } catch (error) {
+                console.error("Error loading CSV:", error);
+                renderDefaultView();
+            }
+        }
+
+        function parseCSV(text) {
+            let lines = text.split("\n");
+            let result = [];
+            for(let i=1; i<lines.length; i++) {
+                if(!lines[i].trim()) continue;
+                let row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                let cleanRow = row.map(val => val.replace(/^"|"$/g, '').trim());
+                if(cleanRow.length >= 2) {
+                    result.push({
+                        branchNum: cleanRow[0],
+                        head: cleanRow[1],
+                        spouse: cleanRow[2],
+                        status: cleanRow[3],
+                        childrenName: cleanRow[4] ? cleanRow[4].split(',').map(s=>s.trim()) : [],
+                        role: cleanRow[5] ? cleanRow[5].split(',').map(s=>s.trim()) : [],
+                        age: cleanRow[6],
+                        spouseName: cleanRow[7],
+                        grandchildren: cleanRow[8] ? cleanRow[8].split(',').map(s=>s.trim()) : []
+                    });
+                }
+            }
+            return result;
+        }
+
+        function renderDefaultView() {
+            document.getElementById('appContainer').innerHTML = `
+                <div class="text-center py-20 bg-white rounded-3xl shadow-sm border border-slate-200/80 p-8 max-w-xl mx-auto">
+                    <div class="w-16 h-16 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 font-bold">⚠️</div>
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2">Google Sheet Data Unavailable</h2>
+                    <p class="text-slate-500 text-sm">Please verify that your published CSV links are valid and publicly accessible.</p>
+                </div>
+            `;
+        }
+
+        function showMainView() {
+            renderMainTree();
+        }
+
+        function renderMainTree() {
+            let html = `
+                <div class="text-center mb-14">
+                    <div class="inline-flex items-center gap-2 bg-amber-50 text-amber-800 font-semibold px-4 py-2 rounded-full text-xs mb-4 shadow-sm border border-amber-200/60 uppercase tracking-wider">
+                        <span>✨ Root Family Lineage</span>
+                    </div>
+                    <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">Late Shri Gopal Rao Chirnjivlu Naidu</h1>
+                    <p class="text-slate-600 mt-3 max-w-2xl mx-auto text-base">Explore all primary family branches, spouses, children, and generational hierarchy below.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            `;
+
+            familyData.forEach(branch => {
+                html += `
+                    <div onclick="openBranch('${branch.branchNum}')" class="branch-card bg-white rounded-3xl p-7 shadow-sm border border-slate-200/70 cursor-pointer flex flex-col justify-between group relative overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 to-indigo-500 opacity-0 group-hover:opacity-100 transition"></div>
+                        <div>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full border border-blue-100">Branch #${branch.branchNum}</span>
+                                <span class="text-xs text-slate-400 font-medium">${branch.status || ''}</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition">${branch.head}</h3>
+                            ${branch.spouse ? `<p class="text-xs text-slate-500 mt-1.5 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Spouse: <span class="font-medium text-slate-700">${branch.spouse}</span></p>` : ''}
+                            <div class="mt-5 pt-4 border-t border-slate-100">
+                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">Children (${branch.childrenName.length})</p>
+                                <div class="flex flex-wrap gap-1.5">
+                                    ${branch.childrenName.map(c => `<span class="bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-lg font-medium">${c}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-8 pt-4 border-t border-slate-50 flex items-center justify-between text-blue-600 text-sm font-semibold">
+                            <span>Explore Branch Tree</span>
+                            <span class="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center transform group-hover:translate-x-1 group-hover:bg-blue-600 group-hover:text-white transition">&rarr;</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            document.getElementById('appContainer').innerHTML = html;
+        }
+
+        function openBranch(branchNum) {
+            const branch = familyData.find(b => b.branchNum == branchNum);
+            if(!branch) return;
+
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            document.getElementById('appContainer').innerHTML = `
+                <button onclick="renderMainTree()" class="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-slate-700 bg-white border border-slate-200/80 px-5 py-2.5 rounded-2xl hover:bg-slate-50 transition shadow-sm">
+                    &larr; Back to All Branches
+                </button>
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 p-6 sm:p-10">
+                    <div class="flex flex-wrap justify-between items-start gap-4 mb-8 pb-6 border-b border-slate-100">
+                        <div>
+                            <span class="bg-blue-50 text-blue-700 text-xs font-bold px-3.5 py-1.5 rounded-full border border-blue-100">Branch #${branch.branchNum}</span>
+                            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3">${branch.head}</h1>
+                            ${branch.spouse ? `<p class="text-sm text-slate-600 mt-2">Spouse: <span class="font-semibold text-slate-800">${branch.spouse}</span></p>` : ''}
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-6">Children & Descendants</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        ${branch.childrenName.map((child, idx) => `
+                            <div class="bg-slate-50/80 border border-slate-200/70 rounded-2xl p-5 hover:border-slate-300 transition">
+                                <div class="flex justify-between items-start">
+                                    <h4 class="font-bold text-slate-900 text-base">${child}</h4>
+                                    <span class="text-xs bg-white text-slate-700 px-2.5 py-1 rounded-md border border-slate-200 font-semibold shadow-2xs">${branch.role[idx] || 'Child'}</span>
+                                </div>
+                                ${branch.spouseName && branch.spouseName !== '-' ? `<p class="text-xs text-slate-500 mt-2.5">Married to: <span class="text-slate-800 font-semibold">${branch.spouseName}</span></p>` : ''}
+                                ${branch.grandchildren.length > 0 ? `
+                                    <div class="mt-4 pt-3.5 border-t border-slate-200/60">
+                                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Grandchildren</p>
+                                        <div class="flex flex-wrap gap-1.5">
+                                            ${branch.grandchildren.map(g => `<span class="bg-amber-50 text-amber-900 text-xs px-2.5 py-1 rounded-lg border border-amber-200/60 font-medium">${g}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleSearch(query) {
+            const resultsBox = document.getElementById('searchResults');
+            if(!query.trim()) {
+                resultsBox.classList.add('hidden');
+                return;
+            }
+            const q = query.toLowerCase();
+            let matches = [];
+
+            familyData.forEach(b => {
+                if(b.head.toLowerCase().includes(q) || (b.spouse && b.spouse.toLowerCase().includes(q))) {
+                    matches.push({name: `${b.head} (Branch #${b.branchNum})`, branchNum: b.branchNum});
+                }
+                b.childrenName.forEach(c => {
+                    if(c.toLowerCase().includes(q)) {
+                        matches.push({name: `${c} (Child under Branch #${b.branchNum})`, branchNum: b.branchNum});
+                    }
+                });
+                b.grandchildren.forEach(g => {
+                    if(g.toLowerCase().includes(q)) {
+                        matches.push({name: `${g} (Grandchild under Branch #${b.branchNum})`, branchNum: b.branchNum});
+                    }
+                });
+            });
+
+            if(matches.length > 0) {
+                resultsBox.innerHTML = matches.slice(0, 5).map(m => `
+                    <div onclick="openBranch('${m.branchNum}'); document.getElementById('searchResults').classList.add('hidden'); document.getElementById('searchInput').value='';" 
+                         class="px-4 py-3 hover:bg-slate-50 cursor-pointer text-sm font-semibold text-slate-700 transition">
+                        ${m.name}
+                    </div>
+                `).join('');
+                resultsBox.classList.remove('hidden');
+            } else {
+                resultsBox.innerHTML = `<div class="px-4 py-4 text-sm text-slate-400 text-center">No family member found</div>`;
+                resultsBox.classList.remove('hidden');
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('#searchInput') && !e.target.closest('#searchResults')) {
+                document.getElementById('searchResults').classList.add('hidden');
+            }
+        });
+
+        loadFamilyData();
+    </script>
+</body>
+</html>
